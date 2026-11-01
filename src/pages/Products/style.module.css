@@ -53,7 +53,7 @@
     margin: 0;
     padding: 0.5rem clamp(1rem, 3vw, 2rem) 0.75rem;
     border-bottom: 1px solid #ded8d1;
-    color: var(--motta-blue);
+    color: var(--a11y-brand-text, var(--motta-blue));
     font-size: 0.95rem;
     font-weight: 500;
 }
@@ -122,12 +122,6 @@
 .critical {
     background: #f9dfe1;
     color: #8f151b;
-}
-
-:global(html[data-a11y-theme="dark"]) :global(body) .regular,
-:global(html[data-a11y-theme="dark"]) :global(body) .attention,
-:global(html[data-a11y-theme="dark"]) :global(body) .critical {
-    color: #063652 !important;
 }
 
 .view-button {

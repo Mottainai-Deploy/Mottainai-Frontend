@@ -1,18 +1,33 @@
 .container {
+    /* Layout */
     display: grid;
     grid-template-columns: 1fr 1fr;
-    min-height: 100vh;
-    min-height: 100dvh;
+    grid-template-rows: minmax(0, 1fr);
+    overflow: hidden;
+
+    /* Tamanho */
+    height: 100vh;
+    height: 100dvh;
+
+    /* Aparência */
     background-color: var(--a11y-surface, var(--main-white));
 }
 
 .authSection {
+    /* Layout */
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: safe center;
     align-items: center;
+
+    /* Tamanho */
     min-width: 0;
+    min-height: 0;
     padding: clamp(1.5rem, 5vw, 3rem);
+
+    /* Aparência */
+    overflow-y: auto;
+    overscroll-behavior: contain;
     background-color: var(--a11y-surface, var(--main-white));
 }
 
@@ -26,7 +41,7 @@
 
 .title {
     margin-bottom: 0.5rem;
-    color: var(--motta-blue);
+    color: var(--a11y-brand-text, var(--motta-blue));
     font-size: clamp(1.8rem, 3vw, 2.2rem);
     font-weight: 700;
     text-align: center;
@@ -68,7 +83,7 @@
     border-radius: 50px;
     outline: none;
     background-color: transparent;
-    color: var(--motta-blue);
+    color: var(--a11y-brand-text, var(--motta-blue));
     font: inherit;
     font-size: 1rem;
 }
@@ -129,7 +144,7 @@
     padding: 18px;
     margin-top: 0.75rem;
     background-color: var(--motta-blue);
-    color: var(--a11y-on-brand, var(--main-white));
+    color: #fff;
     font-size: 1.1rem;
     font-weight: 500;
     transition: background-color calc(0.2s * var(--a11y-motion-factor, 1)) ease-in-out;
@@ -147,7 +162,7 @@
 .secondaryButton {
     padding: 12px 18px;
     background: transparent;
-    color: var(--motta-blue);
+    color: var(--a11y-brand-text, var(--motta-blue));
     font-weight: 700;
     text-decoration: underline;
 }
@@ -157,7 +172,7 @@
     margin-top: -4px;
     border: 0;
     background: transparent;
-    color: var(--motta-blue);
+    color: var(--a11y-brand-text, var(--motta-blue));
     font: inherit;
     font-size: 0.85rem;
     font-weight: 700;
@@ -174,7 +189,7 @@
     align-self: center;
     padding: 0.5rem 1rem;
     background: transparent;
-    color: var(--motta-blue);
+    color: var(--a11y-brand-text, var(--motta-blue));
     font-weight: 700;
     text-decoration: underline;
 }
@@ -189,7 +204,7 @@
 
 .successMessage {
     background-color: #e8f5eb;
-    color: var(--motta-blue);
+    color: var(--a11y-brand-text, var(--motta-blue));
 }
 
 .errorMessage {
@@ -217,30 +232,267 @@
     margin-top: -0.5rem;
 }
 
-.mascotSection {
+.artworkSection {
+    /* Layout */
+    position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: var(--motta-blue);
+    overflow: hidden;
+
+    /* Tamanho */
+    min-width: 0;
+    min-height: 0;
+
+    /* Aparência */
+    background-color: #17232e;
 }
 
-.mascotImage {
-    width: min(100%, 500px);
-    aspect-ratio: 1 / 1;
+:global(html[data-a11y-theme='dark']) .artworkSection {
+    /* Layout */
+    justify-content: flex-start;
+}
+
+:global(html[data-a11y-theme='dark']) .artworkCanvas {
+    /* Aparência */
+    border-left: 4px solid #fff;
+}
+
+.artworkCanvas {
+    /* Layout */
+    position: relative;
+    container-type: inline-size;
+    overflow: hidden;
+
+    /* Tamanho */
+    width: 100%;
+    max-height: 100%;
+    aspect-ratio: 4 / 5;
+
+    /* Aparência */
+    background-color: #17232e;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+}
+
+.artworkCanvas[data-artwork-variant='login'],
+.artworkCanvas[data-artwork-variant='recovery-email'],
+.artworkCanvas[data-artwork-variant='recovery-code'],
+.artworkCanvas[data-artwork-variant='new-password'] {
+    /* Aparência */
+    background-image: url('../../assets/imgs/password-recovery/recovery-background.svg');
+}
+
+.artworkCanvas[data-artwork-variant='password-updated'],
+.artworkCanvas[data-artwork-variant='invalid-link'] {
+    /* Aparência */
+    background-image: url('../../assets/imgs/password-recovery/password-updated-background.svg');
+}
+
+.artworkBrand {
+    /* Layout */
+    position: absolute;
+    z-index: 1;
+    top: 10.67%;
+    left: 13.89%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+
+    /* Tamanho */
+    width: 72.22%;
+}
+
+.artworkWordmark {
+    /* Layout */
+    position: relative;
+    display: block;
+
+    /* Texto */
+    color: #fff;
+    font-family: Lexend, sans-serif;
+    font-size: clamp(2.75rem, 9.167cqw, 4.125rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    text-align: center;
+}
+
+.artworkWordmark::after {
+    /* Layout */
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+
+    /* Tamanho */
+    width: 42.31%;
+    height: 4px;
+
+    /* Aparência */
+    border-radius: 999px;
+    background-color: #f56612;
+}
+
+.artworkJapanese {
+    /* Texto */
+    color: #fff;
+    font-family: 'Noto Sans JP', 'Yu Gothic', Meiryo, sans-serif;
+    font-size: clamp(1.125rem, 3.75cqw, 1.6875rem);
+    font-weight: 700;
+    line-height: 1.4;
+    text-align: center;
+}
+
+.artworkSlogan {
+    /* Layout */
+    position: absolute;
+    z-index: 1;
+    top: 37.56%;
+    left: 5.14%;
+
+    /* Tamanho */
+    width: 51.67%;
+    margin: 0;
+
+    /* Texto */
+    color: #fff;
+    font-family: Lexend, sans-serif;
+    font-size: clamp(1.75rem, 5.28cqw, 2.375rem);
+    font-weight: 700;
+    line-height: 1.27;
+    text-align: left;
+}
+
+.artworkSlogan[data-artwork-variant='password-updated'],
+.artworkSlogan[data-artwork-variant='invalid-link'] {
+    /* Layout */
+    top: 42.56%;
+}
+
+.artworkLine {
+    /* Layout */
+    display: block;
+}
+
+.orangeWord {
+    /* Texto */
+    color: #ff963d;
+    font-weight: 700;
+}
+
+.artworkIcon {
+    /* Layout */
+    position: absolute;
+    z-index: 1;
+    display: block;
+
+    /* Tamanho */
+    max-width: none;
+    height: auto;
+
+    /* Aparência */
+    aspect-ratio: auto;
     object-fit: contain;
+}
+
+.artworkIconCrane {
+    /* Layout */
+    top: 36.17%;
+    left: 51.32%;
+
+    /* Tamanho */
+    width: min(46.81cqw, 37.45dvh);
+}
+
+.artworkIconEmail {
+    /* Layout */
+    top: 39.5%;
+    left: 64.24%;
+
+    /* Tamanho */
+    width: 25.7cqw;
+}
+
+.artworkIconCode {
+    /* Layout */
+    top: 40.56%;
+    left: 54.44%;
+
+    /* Tamanho */
+    width: 37.78cqw;
+}
+
+.artworkIconLock {
+    /* Layout */
+    top: 36.94%;
+    left: 62.85%;
+
+    /* Tamanho */
+    width: 16.69cqw;
+}
+
+.artworkIconUpdated,
+.artworkIconInvalidSeal {
+    /* Layout */
+    top: 37.17%;
+    left: 60.35%;
+
+    /* Tamanho */
+    width: 24.58cqw;
+}
+
+.artworkIconInvalidCross {
+    /* Layout */
+    top: 43.11%;
+    left: 67.78%;
+
+    /* Tamanho */
+    width: 9.72cqw;
 }
 
 @media (max-width: 768px) {
     .container {
         grid-template-columns: 1fr;
     }
-    .mascotSection {
+    .artworkSection {
         display: none;
     }
     .authSection {
-        min-height: 100vh;
-        min-height: 100dvh;
+        min-height: 0;
         padding: clamp(1.25rem, 6vw, 2.5rem) clamp(1rem, 5vw, 2rem);
+    }
+}
+
+@media (max-height: 700px) {
+    .authSection {
+        padding-block: 1rem;
+    }
+
+    .logo {
+        width: 88px;
+        height: 88px;
+        margin-bottom: 0.75rem;
+    }
+
+    .subtitle {
+        margin-bottom: 1rem;
+    }
+
+    .form {
+        gap: 0.75rem;
+    }
+
+    .input {
+        padding-block: 0.75rem;
+    }
+
+    .submitButton {
+        padding-block: 0.8rem;
+        margin-top: 0.25rem;
     }
 }
 
@@ -266,4 +518,11 @@
     .submitButton {
         transition: none;
     }
+}
+
+:global(html[data-a11y-theme="dark"]) .successMessage {
+    /* Aparência */
+    background-color: #205c1c;
+    /* Texto */
+    color: #fff;
 }

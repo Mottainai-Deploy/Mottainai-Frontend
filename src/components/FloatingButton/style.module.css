@@ -3,7 +3,7 @@
   right: max(1rem, env(safe-area-inset-right));
   bottom: max(1rem, env(safe-area-inset-bottom));
   z-index: 1500;
-  color: var(--motta-blue);
+  color: var(--a11y-brand-text, var(--motta-blue));
   font-family: inherit;
 }
 
@@ -121,7 +121,7 @@
   border-radius: 1rem;
   background: var(--a11y-surface, var(--main-white));
   box-shadow: 0 12px 40px rgb(16 42 67 / 25%);
-  color: var(--motta-blue);
+  color: var(--a11y-brand-text, var(--motta-blue));
   visibility: hidden;
   opacity: 0;
   pointer-events: none;
@@ -153,7 +153,7 @@
 
 .panelHeader h2 {
   margin: 0;
-  color: var(--motta-blue);
+  color: var(--a11y-brand-text, var(--motta-blue));
   font-size: 1.2rem;
 }
 
@@ -185,7 +185,7 @@
   margin: 1rem 0 0.5rem;
   padding-top: 0.8rem;
   border-top: 1px solid #e3e8ed;
-  color: var(--motta-blue);
+  color: var(--a11y-brand-text, var(--motta-blue));
   font-size: 1rem;
 }
 
@@ -242,7 +242,7 @@
   background: var(--a11y-surface, var(--main-white));
 
   /* Texto */
-  color: var(--motta-blue);
+  color: var(--a11y-brand-text, var(--motta-blue));
   font-size: 0.82rem;
 }
 
@@ -279,7 +279,7 @@
   border: 1px solid #64788b;
   border-radius: 0.5rem;
   background: var(--a11y-surface, var(--main-white));
-  color: var(--motta-blue);
+  color: var(--a11y-brand-text, var(--motta-blue));
   cursor: pointer;
   font-weight: 700;
 }

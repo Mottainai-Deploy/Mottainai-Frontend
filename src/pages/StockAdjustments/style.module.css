@@ -23,7 +23,7 @@
 .formCard h2,
 .summaryCard h2 {
     margin: 0 0 1.25rem;
-    color: var(--motta-light-blue);
+    color: var(--a11y-brand-text, var(--motta-light-blue));
     font-size: 1rem;
 }
 
@@ -142,7 +142,7 @@
 }
 
 .summaryItem h3 {
-    color: var(--motta-light-blue);
+    color: var(--a11y-brand-text, var(--motta-light-blue));
     font-size: 0.8rem;
 }
 
@@ -160,7 +160,7 @@
 }
 
 .consumptionValue {
-    color: var(--motta-light-blue);
+    color: var(--a11y-brand-text, var(--motta-light-blue));
 }
 
 .expiryValue {

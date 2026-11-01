@@ -2,6 +2,7 @@ import ReusableTable from "@/components/ReusableTable";
 import { faCheck, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Spinner from "@/components/Spinner";
+import { useMinimumLoadingVisibility } from "@/hooks/useMinimumLoadingVisibility";
 import type { ProductImportPreviewItem } from "@/types/product-import.types";
 import type { ProductRegistrationDialogsProps } from "@/types/product-registration-ui.types";
 import type { ReusableTableColumn } from "@/types/reusable-table.types";
@@ -48,6 +49,8 @@ function ProductRegistrationDialogs({
   onCloseSuccess,
   onBackToProducts,
 }: ProductRegistrationDialogsProps) {
+  const minimumRegistrationLoadingVisible = useMinimumLoadingVisibility(status === "registering");
+  const showRegistrationLoading = status === "registering" || minimumRegistrationLoadingVisible;
   const previewOpen = previewItems.length > 0;
 
   return (
@@ -78,9 +81,9 @@ function ProductRegistrationDialogs({
                 className={styles.primary}
                 type="button"
                 onClick={onRegisterProducts}
-                disabled={status === "registering"}
+                disabled={status === "registering" || showRegistrationLoading}
               >
-                {status === "registering" ? <Spinner label="Cadastrando" /> : "Cadastrar no banco"}
+                {showRegistrationLoading ? <Spinner label="Cadastrando" /> : "Cadastrar no banco"}
               </button>
               <button className={styles.secondary} type="button" onClick={onReviewFirstProduct}>
                 Revisar e editar primeiro produto

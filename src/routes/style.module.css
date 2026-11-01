@@ -1,0 +1,19 @@
+.routeContent {
+  /* Aparência */
+  opacity: 0;
+}
+
+.routeContentVisible {
+  /* Efeitos */
+  animation: routeContentFadeIn 1s ease both;
+}
+
+@keyframes routeContentFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}

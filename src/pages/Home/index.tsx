@@ -8,6 +8,7 @@ import { products } from '@/data/products';
 import { wastedItemsByCategory } from '@/data/wastedItemsByCategory';
 import { useHistoricalMetrics } from '@/hooks/useHistoricalMetrics';
 import { useRanking } from '@/hooks/useRanking';
+import { useMinimumLoadingVisibility } from '@/hooks/useMinimumLoadingVisibility';
 import { summarizeProductCriticality } from '@/utils/criticalitySummary';
 import type { DonutChartSegment } from '@/types/donut-chart.types';
 import type { HistoricalMetric } from '@/types/historical-metric.types';
@@ -50,6 +51,10 @@ function Home(){
     const [currentDate, setCurrentDate] = useState(() => new Date());
     const { data, isLoading, error } = useHistoricalMetrics();
     const { data: rankingData, isLoading: isRankingLoading, error: rankingError } = useRanking();
+    const minimumHistoricalLoadingVisible = useMinimumLoadingVisibility(isLoading);
+    const minimumRankingLoadingVisible = useMinimumLoadingVisibility(isRankingLoading);
+    const showHistoricalLoading = isLoading || minimumHistoricalLoadingVisible;
+    const showRankingLoading = isRankingLoading || minimumRankingLoadingVisible;
 
     useEffect(() => {
         const nextMidnight = new Date(currentDate);
@@ -116,14 +121,14 @@ function Home(){
             <div className={styles['container']}>
 
                 {/* grafico */}
-                {isLoading && <p className={styles.feedback} role="status">Carregando histórico...</p>}
-                {error && <p className={styles.feedback} role="alert">{error}</p>}
-                {!isLoading && !error && <HistoricalChart data={data} />}
+                {showHistoricalLoading && <p className={styles.feedback} role="status">Carregando histórico...</p>}
+                {!showHistoricalLoading && error && <p className={styles.feedback} role="alert">{error}</p>}
+                {!showHistoricalLoading && !error && <HistoricalChart data={data} />}
 
                 {/* ranking */}
-                {isRankingLoading && <p className={styles.feedback} role="status">Carregando ranking...</p>}
-                {rankingError && <p className={styles.feedback} role="alert">{rankingError}</p>}
-                {!isRankingLoading && !rankingError && (
+                {showRankingLoading && <p className={styles.feedback} role="status">Carregando ranking...</p>}
+                {!showRankingLoading && rankingError && <p className={styles.feedback} role="alert">{rankingError}</p>}
+                {!showRankingLoading && !rankingError && (
                     <Ranking
                         data={rankingData}
                         title="Top 5 produtos que mais saíram"

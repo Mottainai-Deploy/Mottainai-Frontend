@@ -127,7 +127,7 @@ function Products() {
                   </td>
                   <td className={styles.center}>
                     <button
-                      className={`${styles["view-button"]} a11y-table-action`}
+                      className={`${styles["view-button"]} a11y-table-action table-action-transition`}
                       type="button"
                       onClick={(event) => setDetailsDialog({ record: product, trigger: event.currentTarget })}
                       aria-label={`Ver detalhes de ${product.name}`}

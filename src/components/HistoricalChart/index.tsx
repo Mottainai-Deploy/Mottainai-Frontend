@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 import type { Chart as ChartInstance } from "chart.js";
 import type { HistoricalChartProps } from "@/types/historical-chart.types";
+import { useMinimumLoadingVisibility } from "@/hooks/useMinimumLoadingVisibility";
 import styles from "./style.module.css";
 
 function getThemeColor(variable: string, fallback: string): string {
@@ -55,6 +56,8 @@ function HistoricalChart({
   const canvasId = useId();
   const descriptionId = useId();
   const [chartLoadStatus, setChartLoadStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const minimumChartLoadingVisible = useMinimumLoadingVisibility(chartLoadStatus === "loading");
+  const showChartLoading = chartLoadStatus === "loading" || minimumChartLoadingVisible;
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const chartRef = useRef<ChartInstance<"line", number[], string> | null>(null);
   const activeDataPointIndexRef = useRef<number | null>(null);
@@ -237,7 +240,7 @@ function HistoricalChart({
         </div>
         <span className={styles.period}>{period}</span>
       </div>
-      <div className={styles.chartArea} aria-busy={chartLoadStatus === "loading"}>
+      <div className={styles.chartArea} aria-busy={showChartLoading}>
         <canvas
           id={canvasId}
           ref={canvasRef}
@@ -246,13 +249,13 @@ function HistoricalChart({
           aria-describedby={descriptionId}
         />
       </div>
-      {chartLoadStatus === "loading" && (
+      {showChartLoading && (
         <p className={styles["sr-only"]} role="status">Carregando gráfico.</p>
       )}
-      {chartLoadStatus === "success" && (
+      {!showChartLoading && chartLoadStatus === "success" && (
         <p className={styles["sr-only"]} role="status">Gráfico carregado.</p>
       )}
-      {chartLoadStatus === "error" && (
+      {!showChartLoading && chartLoadStatus === "error" && (
         <p className={styles.dataDetails} role="alert">
           Não foi possível carregar o gráfico. Os valores continuam disponíveis em “Ver dados do gráfico”.
         </p>

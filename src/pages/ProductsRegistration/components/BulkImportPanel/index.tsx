@@ -1,5 +1,6 @@
 import DropdownSelect from "@/components/DropdownSelect";
 import Spinner from "@/components/Spinner";
+import { useMinimumLoadingVisibility } from "@/hooks/useMinimumLoadingVisibility";
 import { faCheck, faCloudArrowUp, faFileLines } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import type { BulkImportPanelProps } from "@/types/product-registration-ui.types";
@@ -26,6 +27,9 @@ function BulkImportPanel({
   onFormatChange,
   onCancel,
 }: BulkImportPanelProps) {
+  const minimumProcessingLoadingVisible = useMinimumLoadingVisibility(state.status === "processing");
+  const showProcessingLoading = state.status === "processing" || minimumProcessingLoadingVisible;
+
   return (
     <div
       id="bulk-registration-panel"
@@ -80,8 +84,8 @@ function BulkImportPanel({
           )}
         </label>
         <div className={styles.actions}>
-          <button className={styles.primary} type="submit" disabled={busy}>
-            {state.status === "processing" ? <Spinner label="Processando" /> : "Inserir"}
+          <button className={styles.primary} type="submit" disabled={busy || showProcessingLoading}>
+            {showProcessingLoading ? <Spinner label="Processando" /> : "Inserir"}
           </button>
           <button className={styles.secondary} type="button" onClick={onCancel} disabled={busy}>
             Cancelar

@@ -12,7 +12,7 @@
     width: fit-content;
     min-height: 2.75rem;
     padding: 0.5rem 0.25rem;
-    color: var(--motta-light-blue);
+    color: var(--a11y-brand-text, var(--motta-light-blue));
     font-weight: 700;
     text-decoration: none;
 }
@@ -37,13 +37,13 @@
 
 .heading p {
     margin: 0 0 0.35rem;
-    color: var(--motta-light-blue);
+    color: var(--a11y-brand-text, var(--motta-light-blue));
     font-weight: 700;
 }
 
 .heading h1 {
     margin: 0;
-    color: var(--motta-blue);
+    color: var(--a11y-brand-text, var(--motta-blue));
     font-size: clamp(1.35rem, 3vw, 2rem);
 }
 
@@ -73,7 +73,7 @@
 
 .feedback h1 {
     margin-top: 0;
-    color: var(--motta-blue);
+    color: var(--a11y-brand-text, var(--motta-blue));
 }
 
 .feedback [role="alert"] {

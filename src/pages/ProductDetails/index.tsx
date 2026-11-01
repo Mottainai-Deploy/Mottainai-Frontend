@@ -6,6 +6,7 @@ import DetailsModal from "@/components/DetailsModal";
 import HistoricalChart from "@/components/HistoricalChart";
 import ReusableTable from "@/components/ReusableTable";
 import { getProductDetails } from "@/services/productDetailsService";
+import { useMinimumLoadingVisibility } from "@/hooks/useMinimumLoadingVisibility";
 import type {
   ProductActionHistory,
   ProductDetail,
@@ -73,6 +74,7 @@ function createHistoryColumns(
 
 const initialState: ProductDetailsState = {
   status: "loading",
+  requestedProductId: null,
   data: null,
   message: "Carregando detalhes do produto...",
 };
@@ -129,6 +131,9 @@ function createSummary(product: ProductDetail): ProductSummaryRow[] {
 function ProductDetails() {
   const { productId } = useParams<{ productId: string }>();
   const [state, setState] = useState<ProductDetailsState>(initialState);
+  const isProductLoading = state.status === "loading" || state.requestedProductId !== productId;
+  const minimumLoadingVisible = useMinimumLoadingVisibility(isProductLoading);
+  const showLoading = isProductLoading || minimumLoadingVisible;
   const [detailsDialog, setDetailsDialog] =
     useState<OpenDetailsDialog<ProductActionHistory> | null>(null);
   const handleCloseDetails = useCallback(() => setDetailsDialog(null), []);
@@ -146,9 +151,10 @@ function ProductDetails() {
         if (active)
           setState(
             product
-              ? { status: "success", data: product, message: "" }
+              ? { status: "success", requestedProductId: productId, data: product, message: "" }
               : {
                   status: "error",
+                  requestedProductId: productId,
                   data: null,
                   message: "Produto não encontrado.",
                 },
@@ -158,6 +164,7 @@ function ProductDetails() {
         if (active)
           setState({
             status: "error",
+            requestedProductId: productId,
             data: null,
             message:
               error instanceof Error
@@ -170,18 +177,12 @@ function ProductDetails() {
       active = false;
     };
   }, [productId]);
-  if (
-    !productId ||
-    state.status === "error" ||
-    (!state.data && state.status !== "loading")
-  )
+  if (!productId)
     return (
       <section className={styles.feedback}>
         <h1>Detalhes do produto</h1>
         <p role="alert">
-          {productId
-            ? state.message
-            : "O identificador do produto não foi informado."}
+          O identificador do produto não foi informado.
         </p>
         <Link className={styles.back} to="/products">
           <FontAwesomeIcon icon={faArrowLeft} /> Voltar para produtos
@@ -189,11 +190,24 @@ function ProductDetails() {
       </section>
     );
 
-  if (state.status === "loading" || !state.data)
+  if (showLoading)
     return (
       <p className={styles.status} role="status">
-        {state.message}
+        {state.requestedProductId === productId
+          ? state.message
+          : "Carregando detalhes do produto..."}
       </p>
+    );
+
+  if (state.status === "error" || !state.data)
+    return (
+      <section className={styles.feedback}>
+        <h1>Detalhes do produto</h1>
+        <p role="alert">{state.message}</p>
+        <Link className={styles.back} to="/products">
+          <FontAwesomeIcon icon={faArrowLeft} /> Voltar para produtos
+        </Link>
+      </section>
     );
 
   const product = state.data;

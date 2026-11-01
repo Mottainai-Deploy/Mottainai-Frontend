@@ -102,7 +102,7 @@
 :global(html[data-a11y-theme="dark"]) :global(body) .tableSection .moderate,
 :global(html[data-a11y-theme="dark"]) :global(body) .tableSection .high,
 :global(html[data-a11y-theme="dark"]) :global(body) .tableSection .critical {
-    color: var(--main-white) !important;
+    color: var(--a11y-brand-text, var(--motta-blue)) !important;
 }
 
 .tableSection {

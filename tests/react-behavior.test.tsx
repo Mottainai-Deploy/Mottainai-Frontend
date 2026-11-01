@@ -7,6 +7,7 @@ import { AuthProvider } from '@/context/AuthProvider';
 import { PrivateRoute } from '@/pages/PrivateRoute';
 import { useAuth } from '@/hooks/useAuth';
 import { useHistoricalMetrics } from '@/hooks/useHistoricalMetrics';
+import { useMinimumLoadingVisibility } from '@/hooks/useMinimumLoadingVisibility';
 import type { HistoricalMetric } from '@/types/historical-metric.types';
 
 vi.mock('@/services/authService', () => ({
@@ -179,5 +180,54 @@ describe('R9 — PrivateRoute', () => {
 
     expect(await screen.findByText('Conteúdo protegido')).toBeTruthy();
     expect(screen.queryByText('Login público')).toBeNull();
+  });
+});
+
+describe('useMinimumLoadingVisibility', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('mantém o indicador visível pelo tempo mínimo após o carregamento', () => {
+    const { result, rerender } = renderHook(
+      ({ isLoading }: { isLoading: boolean }) => useMinimumLoadingVisibility(isLoading),
+      { initialProps: { isLoading: false } },
+    );
+
+    expect(result.current).toBe(false);
+
+    rerender({ isLoading: true });
+    expect(result.current).toBe(true);
+
+    rerender({ isLoading: false });
+    expect(result.current).toBe(true);
+
+    act(() => vi.advanceTimersByTime(499));
+    expect(result.current).toBe(true);
+
+    act(() => vi.advanceTimersByTime(1));
+    expect(result.current).toBe(false);
+  });
+
+  it('reinicia o período mínimo quando um novo carregamento começa antes do anterior terminar', () => {
+    const { result, rerender } = renderHook(
+      ({ isLoading }: { isLoading: boolean }) => useMinimumLoadingVisibility(isLoading),
+      { initialProps: { isLoading: true } },
+    );
+
+    rerender({ isLoading: false });
+    act(() => vi.advanceTimersByTime(300));
+    rerender({ isLoading: true });
+    rerender({ isLoading: false });
+
+    act(() => vi.advanceTimersByTime(499));
+    expect(result.current).toBe(true);
+
+    act(() => vi.advanceTimersByTime(1));
+    expect(result.current).toBe(false);
   });
 });

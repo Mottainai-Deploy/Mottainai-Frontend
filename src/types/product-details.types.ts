@@ -33,6 +33,7 @@ export interface ProductSummaryRow {
 
 export interface ProductDetailsState {
   status: "loading" | "success" | "error";
+  requestedProductId: string | null;
   data: ProductDetail | null;
   message: string;
 }

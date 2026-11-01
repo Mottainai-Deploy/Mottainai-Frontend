@@ -8,7 +8,7 @@
     border-radius: 12px;
     background: var(--a11y-surface, var(--main-white));
     box-shadow: 0 2px 8px rgba(var(--motta-blue-rgb), 0.08);
-    color: var(--motta-blue);
+    color: var(--a11y-brand-text, var(--motta-blue));
 }
 
 .heading h2 {
@@ -115,7 +115,7 @@
     border: 1px solid transparent;
     border-radius: 6px;
     background: transparent;
-    color: var(--motta-blue);
+    color: var(--a11y-brand-text, var(--motta-blue));
     font: inherit;
     text-align: left;
     cursor: pointer;

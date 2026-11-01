@@ -10,12 +10,12 @@
     border: 1px solid var(--a11y-card-border, rgba(var(--motta-blue-rgb), 0.12));
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(var(--motta-blue-rgb), 0.08);
-    color: var(--motta-blue);
+    color: var(--a11y-brand-text, var(--motta-blue));
 }
 
 .card h2 {
     margin: 0 0 16px;
-    color: var(--motta-light-blue);
+    color: var(--a11y-brand-text, var(--motta-light-blue));
     font-size: 1rem;
     font-weight: 500;
 }

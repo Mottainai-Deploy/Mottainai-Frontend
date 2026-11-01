@@ -1,0 +1,569 @@
+.screen {
+  /* Layout */
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  overflow: hidden;
+  overscroll-behavior: none;
+  display: grid;
+  place-items: center;
+
+  /* Tamanho */
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+
+  /* Aparência */
+  background-color: var(--main-white, #fff);
+}
+
+.stage {
+  /* Layout */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+
+  /* Tamanho */
+  width: max(100vw, 160vh);
+  height: max(100vh, 62.5vw);
+  aspect-ratio: 16 / 10;
+
+  /* Efeitos */
+  transform: translate(-50%, -50%);
+}
+
+.fullFrameAsset {
+  /* Layout */
+  position: absolute;
+  inset: 0;
+  display: block;
+
+  /* Tamanho */
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  aspect-ratio: auto;
+
+  /* Aparência */
+  object-fit: fill;
+}
+
+.lightRisingWave {
+  /* Layout */
+  position: absolute;
+  top: -320%;
+  right: calc(-8% - 100px);
+  left: calc(-8% - 100px);
+  z-index: 0;
+
+  /* Tamanho */
+  height: 500%;
+
+  /* Efeitos */
+  animation: kf_light_rising_wave 5.5s ease-in-out 1 normal forwards;
+  will-change: translate;
+}
+
+.darkRisingWave {
+  /* Layout */
+  position: absolute;
+  top: -320%;
+  right: -8%;
+  left: -8%;
+  z-index: 1;
+
+  /* Tamanho */
+  height: 500%;
+
+  /* Efeitos */
+  animation: kf_dark_rising_wave 6s ease-in-out 1 normal forwards;
+  will-change: translate;
+}
+
+.sceneImage {
+  /* Layout */
+  position: absolute;
+  display: block;
+  max-width: none;
+
+  /* Tamanho */
+  height: auto;
+  aspect-ratio: auto;
+
+  /* Aparência */
+  object-fit: contain;
+}
+
+.logo {
+  /* Layout */
+  top: 12%;
+  left: 50%;
+  z-index: 2;
+
+  /* Tamanho */
+  width: clamp(4.5rem, 7vw, 6rem);
+
+  /* Efeitos */
+  transform: translateX(-50%);
+}
+
+.title {
+  /* Layout */
+  position: absolute;
+  top: 25%;
+  left: 50%;
+  z-index: 3;
+
+  /* Tamanho */
+  width: max-content;
+  max-width: 94vw;
+  margin: 0;
+
+  /* Texto */
+  color: #fff;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: clamp(2rem, 5vw, 4.5rem);
+  font-weight: 700;
+  line-height: 1.05;
+  text-align: center;
+  white-space: nowrap;
+
+  /* Efeitos */
+  transform: translateX(-50%);
+}
+
+.subtitle {
+  /* Layout */
+  position: absolute;
+  top: 37%;
+  left: 50%;
+  z-index: 4;
+
+  /* Tamanho */
+  width: max-content;
+  max-width: 94vw;
+  margin: 0;
+
+  /* Texto */
+  color: var(--motta-light-orange, #dd7b2d);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: clamp(1.25rem, 2.2vw, 2rem);
+  font-weight: 400;
+  line-height: 1.3;
+  text-align: center;
+  white-space: nowrap;
+
+  /* Efeitos */
+  transform: translateX(-50%);
+}
+
+.sun {
+  /* Layout */
+  top: 60%;
+  left: 50%;
+  z-index: 5;
+
+  /* Tamanho */
+  width: 23.61%;
+
+  /* Efeitos */
+  transform: translateX(-50%);
+}
+
+.sea {
+  /* Layout */
+  position: absolute;
+  top: 80%;
+  left: 0;
+  z-index: 2;
+
+  /* Tamanho */
+  width: 100%;
+  height: 24%;
+  background-size: 100% 6rem;
+
+  /* Aparência */
+  background-color: #810f42;
+  background-image: repeating-linear-gradient(
+    0deg,
+    #0f4c81 0 3rem,
+    #43b7d1 3rem 6rem
+  );
+
+  /* Efeitos */
+  animation: kf_sea_stripes_rise 1.8s linear infinite;
+  will-change: background-position;
+}
+
+.wave {
+  /* Layout */
+  z-index: 7;
+
+  /* Tamanho */
+  width: 25%;
+}
+
+.waveLeftOuter {
+  /* Layout */
+  top: 72.22%;
+  left: 0;
+}
+
+.waveLeftInner {
+  /* Layout */
+  top: 75.56%;
+  left: 20.83%;
+}
+
+.waveCenter {
+  /* Layout */
+  top: 68.89%;
+  left: 38.89%;
+  width: 29.17%;
+}
+
+.waveRightInner {
+  /* Layout */
+  top: 75.56%;
+  left: 62.5%;
+}
+
+.waveRightOuter {
+  /* Layout */
+  top: 72.22%;
+  left: 81.94%;
+}
+
+.foamLayers {
+  /* Layout */
+  position: absolute;
+  inset: 0 -8%;
+  z-index: 7;
+}
+
+.footerWaveLines {
+  /* Layout */
+  position: absolute;
+  inset: 0 calc(-8% - 100px);
+  z-index: 8;
+
+  /* Efeitos */
+  animation: kf_footer_wave_sway 4.8s ease-in-out infinite;
+  will-change: translate;
+}
+
+.progressTrack {
+  /* Layout */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 10;
+
+  /* Tamanho */
+  width: min(48.61%, 44rem);
+  height: clamp(1rem, 3.11%, 1.75rem);
+
+  /* Aparência */
+  border-radius: 999px;
+  background-color: #e5e5e5;
+
+  /* Efeitos */
+  transform: translate(-50%, -50%);
+}
+
+.progressFill {
+  /* Layout */
+  position: absolute;
+  inset: 0 auto 0 0;
+  z-index: 1;
+
+  /* Tamanho */
+  width: 0;
+  --progress-stripe-width: clamp(0.625rem, 1.3889vw, 1.25rem);
+
+  /* Aparência */
+  border-radius: 999px;
+  background-color: #f2a15e;
+  background-image: repeating-linear-gradient(
+    90deg,
+    #f2a15e 0 var(--progress-stripe-width),
+    #a84b00 var(--progress-stripe-width) calc(var(--progress-stripe-width) * 2)
+  );
+
+}
+
+.progressCrane {
+  /* Layout */
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  display: block;
+
+  /* Tamanho */
+  width: clamp(3.5rem, 6vw, 5rem);
+  aspect-ratio: 98.4787 / 85.3538;
+
+  /* Efeitos */
+  animation: kf_progress_crane_bob 1.6s ease-in-out infinite;
+  filter: drop-shadow(0 1px 2px rgb(16 42 67 / 55%));
+  transform: translateY(-50%);
+}
+
+.progressCraneArtwork {
+  /* Layout */
+  display: block;
+
+  /* Tamanho */
+  width: 100%;
+  height: auto;
+}
+
+.loadingStatus {
+  /* Layout */
+  position: absolute;
+  top: calc(50% + 2.75rem);
+  left: 50%;
+  z-index: 10;
+
+  /* Tamanho */
+  width: max-content;
+  padding: 0.3rem 0.8rem;
+  margin: 0;
+
+  /* Aparência */
+  border-radius: 999px;
+  background-color: rgb(255 255 255 / 94%);
+
+  /* Texto */
+  color: #102a43;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: clamp(0.875rem, 1.25vw, 1.125rem);
+  line-height: 1.2;
+  white-space: nowrap;
+
+  /* Efeitos */
+  transform: translateX(-50%);
+}
+
+:global(html[data-a11y-theme="dark"]:not([data-a11y-contrast="high"]):not([data-a11y-contrast="low"])) .subtitle {
+  /* Texto */
+  color: var(--motta-light-orange, #dd7b2d) !important;
+}
+
+:global(html[data-a11y-theme="dark"]:not([data-a11y-contrast="high"]):not([data-a11y-contrast="low"])) .loadingStatus {
+  /* Aparência */
+  background-color: var(--a11y-surface) !important;
+  /* Texto */
+  color: #fff !important;
+}
+
+@keyframes kf_dark_rising_wave {
+  0% {
+    translate: 0 0;
+  }
+
+  30% {
+    translate: 0 -5%;
+  }
+
+  65% {
+    translate: 0 -11%;
+  }
+
+  100% {
+    translate: 0 -16%;
+  }
+}
+
+@keyframes kf_light_rising_wave {
+  0% {
+    translate: -1.5% 0;
+  }
+
+  30% {
+    translate: 2% -5%;
+  }
+
+  70% {
+    translate: -2% -11%;
+  }
+
+  100% {
+    translate: 1.5% -16%;
+  }
+}
+
+@keyframes kf_footer_wave_sway {
+  0%,
+  100% {
+    translate: -1.25% 0;
+  }
+
+  50% {
+    translate: 1.25% 0;
+  }
+}
+
+@keyframes kf_sea_stripes_rise {
+  0% {
+    background-position: 0 0;
+  }
+
+  100% {
+    background-position: 0 3rem;
+  }
+}
+
+@keyframes kf_progress_crane_bob {
+  0%,
+  100% {
+    transform: translateY(calc(-50% - 0.45rem));
+  }
+
+  50% {
+    transform: translateY(calc(-50% + 0.45rem));
+  }
+}
+
+@media (min-width: 601px) and (max-width: 900px) {
+  .progressTrack {
+    /* Tamanho */
+    width: 70vw;
+  }
+
+  .progressCrane {
+    /* Tamanho */
+    width: clamp(3rem, 9vw, 4rem);
+  }
+}
+
+@media (max-width: 600px) {
+  .logo {
+    /* Layout */
+    top: 12%;
+
+    /* Tamanho */
+    width: clamp(3.5rem, 14vw, 4.5rem);
+  }
+
+  .title {
+    /* Layout */
+    top: 25%;
+
+    /* Texto */
+    font-size: clamp(1.8rem, 7vw, 2.25rem);
+  }
+
+  .subtitle {
+    /* Layout */
+    top: 38%;
+
+    /* Texto */
+    font-size: clamp(1.25rem, 5vw, 1.5rem);
+  }
+
+  .sun {
+    /* Layout */
+    top: 60%;
+
+    /* Tamanho */
+    width: clamp(8rem, 42vw, 10rem);
+  }
+
+  .progressTrack {
+    /* Tamanho */
+    width: 66vw;
+    height: 3.3%;
+  }
+
+  .progressCrane {
+    /* Tamanho */
+    width: clamp(3rem, 13vw, 3.25rem);
+  }
+
+  .loadingStatus {
+    /* Tamanho */
+    font-size: clamp(0.875rem, 3.6vw, 1.125rem);
+  }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .logo {
+    /* Layout */
+    top: 18%;
+
+    /* Tamanho */
+    width: clamp(3rem, 8vw, 4rem);
+  }
+
+  .title {
+    /* Layout */
+    top: 35%;
+  }
+
+  .subtitle {
+    /* Layout */
+    top: 50%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .darkRisingWave,
+  .lightRisingWave,
+  .sea,
+  .footerWaveLines {
+    /* Efeitos */
+    animation: none;
+    will-change: auto;
+  }
+
+  .darkRisingWave,
+  .lightRisingWave {
+    translate: 0 -16%;
+  }
+
+  .footerWaveLines {
+    translate: 0 0;
+  }
+
+  .progressCrane {
+    /* Efeitos */
+    animation: none;
+    transform: translateY(-50%);
+  }
+}
+
+:global(html[data-a11y-motion="100"]) .darkRisingWave {
+  /* Efeitos */
+  animation: none;
+  translate: 0 -16%;
+  will-change: auto;
+}
+
+:global(html[data-a11y-motion="100"]) .lightRisingWave {
+  /* Efeitos */
+  animation: none;
+  translate: 0 -16%;
+  will-change: auto;
+}
+
+:global(html[data-a11y-motion="100"]) .sea {
+  /* Efeitos */
+  animation: none;
+  background-position: 0 0;
+  will-change: auto;
+}
+
+:global(html[data-a11y-motion="100"]) .footerWaveLines {
+  /* Efeitos */
+  animation: none;
+  translate: 0 0;
+  will-change: auto;
+}
+
+:global(html[data-a11y-motion="100"]) .progressCrane {
+  /* Efeitos */
+  animation: none;
+  transform: translateY(-50%);
+  will-change: auto;
+}

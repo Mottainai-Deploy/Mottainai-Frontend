@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, useState, type CSSProperties, type MouseEvent } from 'react';
 import type { ArcElement, Chart as ChartInstance, Plugin } from 'chart.js';
 import type { DonutChartProps } from '@/types/donut-chart.types';
+import { useMinimumLoadingVisibility } from '@/hooks/useMinimumLoadingVisibility';
 import styles from './style.module.css';
 
 function getThemeColor(variable: string, fallback: string): string {
@@ -201,6 +202,8 @@ function DonutChart({ title, description, segments, centerLabel = 'Total', value
   const [darkTheme, setDarkTheme] = useState(hasDarkTheme);
   const [highContrast, setHighContrast] = useState(hasHighContrast);
   const [chartLoadStatus, setChartLoadStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const minimumChartLoadingVisible = useMinimumLoadingVisibility(chartLoadStatus === 'loading');
+  const showChartLoading = chartLoadStatus === 'loading' || minimumChartLoadingVisible;
   const total = segments.reduce((sum, segment) => sum + segment.value, 0);
   const activeSegment = activeIndex === null ? null : segments[activeIndex];
 
@@ -395,13 +398,13 @@ function DonutChart({ title, description, segments, centerLabel = 'Total', value
           <span>{activeSegment ? activeSegment.label : centerLabel}</span>
         </div>
       </div>
-      {chartLoadStatus === 'loading' && (
+      {showChartLoading && (
         <p className={styles.srOnly} role="status">Carregando gráfico.</p>
       )}
-      {chartLoadStatus === 'success' && (
+      {!showChartLoading && chartLoadStatus === 'success' && (
         <p className={styles.srOnly} role="status">Gráfico carregado.</p>
       )}
-      {chartLoadStatus === 'error' && (
+      {!showChartLoading && chartLoadStatus === 'error' && (
         <p className={styles.chartError} role="alert">
           Não foi possível carregar o gráfico. Os dados permanecem disponíveis na lista abaixo.
         </p>

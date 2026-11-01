@@ -1,5 +1,6 @@
 import DropdownSelect from "@/components/DropdownSelect";
 import Spinner from "@/components/Spinner";
+import { useMinimumLoadingVisibility } from "@/hooks/useMinimumLoadingVisibility";
 import type { ProductDraft } from "@/types/product-import.types";
 import type { SingleProductFormProps } from "@/types/product-registration-ui.types";
 import styles from "@/pages/ProductsRegistration/style.module.css";
@@ -9,6 +10,8 @@ const measurementUnits = ["Unidade", "Quilograma", "Litro", "Caixa"];
 const suppliers = ["Serjão da massa", "Distribuidora Central", "Fornecedor local"];
 
 function SingleProductForm({ mode, draft, onSubmit, onDraftChange, onCancel }: SingleProductFormProps) {
+  const minimumRegistrationLoadingVisible = useMinimumLoadingVisibility(draft.status === "registering");
+  const showRegistrationLoading = draft.status === "registering" || minimumRegistrationLoadingVisible;
   const fieldErrorIds: Record<keyof ProductDraft, string> = {
     sku: "product-sku-error",
     barcode: "product-barcode-error",
@@ -126,8 +129,8 @@ function SingleProductForm({ mode, draft, onSubmit, onDraftChange, onCancel }: S
           </label>
         </div>
         <div className={styles.actions}>
-          <button className={styles.primary} type="submit" disabled={draft.status === "registering"}>
-            {draft.status === "registering" ? <Spinner label="Cadastrando" /> : "Cadastrar produto"}
+          <button className={styles.primary} type="submit" disabled={draft.status === "registering" || showRegistrationLoading}>
+            {showRegistrationLoading ? <Spinner label="Cadastrando" /> : "Cadastrar produto"}
           </button>
           <button className={styles.secondary} type="button" onClick={onCancel}>
             Cancelar cadastro

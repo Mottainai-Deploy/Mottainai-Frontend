@@ -1,27 +1,194 @@
 .wrapper {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.55rem;
+  /* Layout */
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+
+  /* Tamanho */
+  --spinner-size: 1rem;
+
+  /* Texto */
+  color: var(--a11y-brand-text, var(--motta-blue, #102a43));
 }
 
-.spinner {
-    width: 1rem;
-    height: 1rem;
-    border: 2px solid currentColor;
-    border-right-color: transparent;
-    border-radius: 50%;
-    animation: spin calc(0.7s * var(--a11y-motion-factor, 1)) linear infinite;
+.large {
+  /* Layout */
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  /* Tamanho */
+  --spinner-size: 11.885rem;
+  --spinner-scale: 1;
 }
 
-@keyframes spin {
-    to {
-        transform: rotate(360deg);
-    }
+.compact .ring {
+  /* Efeitos */
+  animation-duration: calc(2s * var(--a11y-motion-factor, 1));
+}
+
+.compact .ringBack {
+  /* Aparência */
+  opacity: 0;
+}
+
+.visual {
+  /* Layout */
+  position: relative;
+  display: block;
+  flex-shrink: 0;
+
+  /* Tamanho */
+  width: var(--spinner-size);
+  height: var(--spinner-size);
+  aspect-ratio: 1;
+
+  /* Aparência */
+  background-color: #fff;
+  border-radius: 50%;
+}
+
+:global(html[data-a11y-theme="dark"]) .visual {
+  /* Aparência */
+  background-color: #063652;
+}
+
+.ring,
+.ringOrbit,
+.craneLayer {
+  /* Layout */
+  position: absolute;
+}
+
+.ring {
+  /* Layout */
+  inset: 0;
+
+  /* Tamanho */
+  width: 100%;
+  height: 100%;
+
+  /* Texto */
+  color: var(--motta-light-orange, #dd7b2d);
+
+  /* Efeitos */
+  animation: flightLoop calc(2s * var(--a11y-motion-factor, 1)) linear infinite;
+}
+
+.ringBack {
+  /* Aparência */
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  opacity: 0.38;
+}
+
+.ringFront {
+  /* Aparência */
+  fill: currentColor;
+}
+
+.ringOrbit {
+  /* Layout */
+  top: 50%;
+  left: 50%;
+  display: grid;
+  place-items: center;
+
+  /* Tamanho */
+  width: 190.16px;
+  height: 190.16px;
+
+  /* Efeitos */
+  transform: translate(-50%, -50%) scale(var(--spinner-scale)) rotate(180deg);
+  transform-origin: center;
+  animation: ringOrbit calc(2s * var(--a11y-motion-factor, 1)) linear infinite;
+}
+
+.ringArtwork {
+  /* Layout */
+  display: block;
+}
+
+.craneLayer {
+  /* Layout */
+  top: 50%;
+  left: 50%;
+  display: grid;
+  place-items: center;
+
+  /* Tamanho */
+  width: 98.4787px;
+  height: 85.3538px;
+
+  /* Efeitos */
+  transform: translate(-50%, -50%) scale(var(--spinner-scale));
+  transform-origin: center;
+}
+
+.label {
+  /* Texto */
+  color: inherit;
+}
+
+.visuallyHidden {
+  /* Layout */
+  position: absolute;
+  overflow: hidden;
+
+  /* Tamanho */
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+
+  /* Aparência */
+  border: 0;
+
+  /* Texto */
+  white-space: nowrap;
+
+  /* Efeitos */
+  clip-path: inset(50%);
+}
+
+@keyframes flightLoop {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes ringOrbit {
+  from {
+    transform: translate(-50%, -50%) scale(var(--spinner-scale)) rotate(180deg);
+  }
+
+  to {
+    transform: translate(-50%, -50%) scale(var(--spinner-scale)) rotate(-180deg);
+  }
+}
+
+@media (max-width: 480px) {
+  .large {
+    /* Tamanho */
+    --spinner-size: 8.375rem;
+    --spinner-scale: 0.705;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 1199px) {
+  .large {
+    /* Tamanho */
+    --spinner-size: 9rem;
+    --spinner-scale: 0.757;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .spinner {
-        animation-duration: calc(1.5s * var(--a11y-motion-factor, 1));
-    }
+  .ring,
+  .ringOrbit {
+    /* Efeitos */
+    animation: none;
+  }
 }

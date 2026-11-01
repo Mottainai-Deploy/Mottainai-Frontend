@@ -1,0 +1,38 @@
+.container-card {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 28px;
+    align-items: stretch;
+    width: 100%;
+}
+
+.page {
+    width: 100%;
+    min-width: 0;
+    margin-top: clamp(1rem, 2vw, 1.5rem);
+}
+
+.sr-only {
+    position: absolute;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    border: 0;
+    white-space: nowrap;
+}
+
+@media (max-width: 1024px) {
+    .container-card {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px;
+    }
+}
+
+@media (max-width: 600px) {
+    .container-card {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+}

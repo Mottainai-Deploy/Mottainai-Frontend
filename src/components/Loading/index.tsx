@@ -1,22 +1,40 @@
+import { useEffect } from 'react';
 import mottainaiLogo from '@/assets/icons/Logo-Orange.png';
-import thinkingOtter from '@/assets/imgs/lontra-pensando.webp';
+import Spinner from '@/components/Spinner';
 import styles from './style.module.css';
 
 function Loading() {
+    useEffect(() => {
+        const previousTitle = document.title;
+        document.title = 'Carregando | Mottainai';
+
+        return () => {
+            document.title = previousTitle;
+        };
+    }, []);
+
     return (
-        <main className={styles.screen}>
-            <section className={styles.card} role="status" aria-live="polite" aria-busy="true">
-                <img className={styles.logo} src={mottainaiLogo} alt="Mottainai" />
-                <div className={styles.illustration} aria-hidden="true">
-                    <span className={styles.orbit} />
-                    <img src={thinkingOtter} alt="" />
-                </div>
-                <p className={styles.eyebrow}>Seu espaço de trabalho</p>
-                <h1>Estamos preparando seu acesso</h1>
-                <p className={styles.description}>Só um instante enquanto entramos na sua conta.</p>
-                <span className={styles.progress} aria-hidden="true"><span /></span>
-                <span className={styles.srOnly}>Entrando na sua conta</span>
-            </section>
+        <main
+            className={styles.screen}
+            aria-busy="true"
+        >
+            <div className={styles.content}>
+                <header className={styles.brand}>
+                    <img
+                        className={styles.logo}
+                        src={mottainaiLogo}
+                        alt=""
+                        aria-hidden="true"
+                        width={48}
+                        height={48}
+                        decoding="async"
+                    />
+                    <h1 className={styles.brandName}>
+                        Mottainai
+                    </h1>
+                </header>
+                <Spinner label="Carregando página" size="large" />
+            </div>
         </main>
     );
 }

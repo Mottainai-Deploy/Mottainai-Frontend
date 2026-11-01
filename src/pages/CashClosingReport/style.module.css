@@ -1,7 +1,7 @@
 .page {
     width: 100%;
     min-width: 0;
-    color: var(--motta-blue);
+    color: var(--a11y-brand-text, var(--motta-blue));
 }
 
 .summaryCard,
@@ -16,7 +16,7 @@
 
 .summaryCard h1 {
     margin: 0 0 1rem;
-    color: var(--motta-light-blue);
+    color: var(--a11y-brand-text, var(--motta-light-blue));
     font-size: 1rem;
 }
 
@@ -101,7 +101,7 @@
     border-radius: 0.45rem;
     background: rgba(45, 87, 120, 0.08);
     box-shadow: 0 1px 2px rgba(var(--motta-blue-rgb), 0.12);
-    color: var(--motta-blue);
+    color: var(--a11y-brand-text, var(--motta-blue));
     font: inherit;
     font-size: 0.75rem;
     font-weight: 700;

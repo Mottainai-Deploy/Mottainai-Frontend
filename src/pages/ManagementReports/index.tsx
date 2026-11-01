@@ -19,6 +19,7 @@ import {
   getManagementReportPreferences,
   saveManagementReportPreference,
 } from '@/services/managementReportPreferencesService';
+import { useMinimumLoadingVisibility } from '@/hooks/useMinimumLoadingVisibility';
 import styles from './style.module.css';
 
 const initialState: ManagementReportPageState = {
@@ -55,6 +56,20 @@ function ManagementReports() {
   const categoryId = useId();
   const formatId = useId();
   const [state, setState] = useState<ManagementReportPageState>(initialState);
+  const minimumReportsLoadingVisible = useMinimumLoadingVisibility(state.isLoadingReports);
+  const minimumPreferenceSavingVisible = useMinimumLoadingVisibility(state.isSavingPreference);
+  const minimumReportSavingVisible = useMinimumLoadingVisibility(state.isSavingReport);
+  const showReportsLoading = state.isLoadingReports || minimumReportsLoadingVisible;
+  const showPreferenceSaving = state.isSavingPreference || minimumPreferenceSavingVisible;
+  const showReportSaving = state.isSavingReport || minimumReportSavingVisible;
+  const hasVisibleLoading = showReportsLoading || showPreferenceSaving || showReportSaving;
+  const displayedFeedback = showReportsLoading
+    ? ''
+    : showPreferenceSaving
+      ? 'Salvando preferência de formato…'
+      : showReportSaving
+        ? 'Exportando e salvando relatório neste navegador…'
+        : state.feedback;
   const [detailsDialog, setDetailsDialog] =
     useState<OpenDetailsDialog<ManagementReport> | null>(null);
   const handleCloseDetails = useCallback(() => setDetailsDialog(null), []);
@@ -315,7 +330,7 @@ function ManagementReports() {
 
         <fieldset
           className={styles.formatPicker}
-          disabled={state.isLoadingReports || state.isSavingPreference || state.isSavingReport}
+          disabled={state.isLoadingReports || state.isSavingPreference || state.isSavingReport || showReportsLoading || showPreferenceSaving || showReportSaving}
         >
           <legend>Formato de exportação</legend>
           <div className={styles.formatOptions}>
@@ -349,14 +364,14 @@ function ManagementReports() {
             type="submit"
             className={styles.exportButton}
             formNoValidate={Boolean(selectedReport)}
-            disabled={state.isLoadingReports || state.isSavingPreference || state.isSavingReport}
+            disabled={state.isLoadingReports || state.isSavingPreference || state.isSavingReport || showReportsLoading || showPreferenceSaving || showReportSaving}
           >
-            {state.isSavingReport ? 'Salvando…' : `Exportar ${state.format.toUpperCase()}`}
+            {showReportSaving ? 'Salvando…' : `Exportar ${state.format.toUpperCase()}`}
           </button>
         </div>
         </form>
-        {state.feedback && <p className={styles.success} role="status">{state.feedback}</p>}
-        {state.error && <p className={styles.error} role="alert">{state.error}</p>}
+        {displayedFeedback && <p className={styles.success} role="status">{displayedFeedback}</p>}
+        {!hasVisibleLoading && state.error && <p className={styles.error} role="alert">{state.error}</p>}
       </section>
 
       <section className={styles.card} aria-labelledby="report-results-title">
@@ -402,8 +417,8 @@ function ManagementReports() {
             <p>Os relatórios ficam salvos neste navegador por até 1 ano.</p>
           </div>
         </div>
-        {state.isLoadingReports && <p role="status">Carregando relatórios salvos…</p>}
-        {!state.isLoadingReports && state.reports.length ? (
+        {showReportsLoading && <p role="status">Carregando relatórios salvos…</p>}
+        {!showReportsLoading && state.reports.length ? (
           <div
             className={styles.tableWrap}
             role="region"
@@ -426,7 +441,7 @@ function ManagementReports() {
                       <div className={styles.reportActions}>
                         <button
                           type="button"
-                          className={`${styles.viewButton} a11y-table-action`}
+                          className={`${styles.viewButton} a11y-table-action table-action-transition`}
                           aria-label={`Ver relatório de produtos mais vendidos, gerado em ${dateFormatter.format(new Date(report.createdAt))}`}
                           aria-haspopup="dialog"
                           onClick={(event) => setDetailsDialog({ record: report, trigger: event.currentTarget })}
@@ -453,7 +468,7 @@ function ManagementReports() {
               </tbody>
             </table>
           </div>
-        ) : !state.isLoadingReports ? (
+        ) : !showReportsLoading ? (
           <p className={styles.emptyState}>Nenhum relatório foi salvo neste navegador ainda.</p>
         ) : null}
       </section>

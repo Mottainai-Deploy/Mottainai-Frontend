@@ -4,10 +4,11 @@ import type { AccessibilityPreferences, AccessibilityPreferenceKey } from "@/typ
 import { cancelSpeech } from "@/services/speechService";
 import type { AccessibilityPanelProps } from "@/types/accessibility-widget.types";
 import { DEFAULT_ACCESSIBILITY_PREFERENCES, loadAccessibilityPreferences, saveAccessibilityPreferences } from "@/utils/accessibilityPreferences";
+import { loadModuleWithMinimumDuration } from "@/utils/loadModuleWithMinimumDuration";
 import styles from "./style.module.css";
 
 const loadAccessibilityPanel = () => import("./AccessibilityPanel");
-const AccessibilityPanel = lazy(loadAccessibilityPanel);
+const AccessibilityPanel = lazy(() => loadModuleWithMinimumDuration(loadAccessibilityPanel));
 
 function FloatingButton() {
   const id = useId();

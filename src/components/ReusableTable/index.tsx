@@ -64,6 +64,7 @@ function ReusableTable<T extends object>({
                                 {columns.map((column) => {
                                     const content = column.renderCell(row);
                                     const alignmentClass = alignmentClasses[column.align ?? 'start'];
+                                    const tone = column.tone?.(row) ?? 'neutral';
                                     const actionText = column.display === 'action'
                                         ? column.actionText?.(row) ?? 'Ver'
                                         : undefined;
@@ -72,15 +73,16 @@ function ReusableTable<T extends object>({
                                         <td className={alignmentClass} key={column.id}>
                                             {column.display === 'badge' ? (
                                                 <span
-                                                    className={`${styles.badge} ${toneClasses[column.tone?.(row) ?? 'neutral']}`}
+                                                    className={`${styles.badge} ${toneClasses[tone]}`}
                                                     data-a11y-light-surface="true"
+                                                    data-tone={tone}
                                                 >
                                                     {content}
                                                 </span>
                                             ) : column.display === 'action' ? (
                                                 <button
                                                     type="button"
-                                                    className={`${styles.actionButton} a11y-table-action`}
+                                                    className={`${styles.actionButton} a11y-table-action table-action-transition`}
                                                     onClick={(event) => column.onAction?.(row, event)}
                                                     aria-label={column.actionLabel?.(row) ?? 'Ver ação'}
                                                     aria-haspopup={column.actionHasPopup === false ? undefined : 'dialog'}

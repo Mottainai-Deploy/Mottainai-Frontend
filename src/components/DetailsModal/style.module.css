@@ -132,8 +132,15 @@
 }
 
 .detailRow dt {
-    color: #14321c;
+    /* Texto */
     font-weight: 700;
+    color: var(--motta-orange);
+}
+
+html[data-a11y-theme="dark"] .detailRow dt {
+    /* Texto */
+    font-weight: 700;
+    color: #ff963d;
 }
 
 .detailRow dd {
@@ -154,6 +161,23 @@
     margin-bottom: 0.5rem;
     color: #14321c;
     font-size: 1rem;
+}
+
+html[data-a11y-theme="dark"] .eyebrow,
+html[data-a11y-theme="dark"] .closeButton {
+    /* Texto */
+    color: #ff963d;
+}
+
+html[data-a11y-theme="dark"] .details {
+    /* Aparência */
+    border-top-color: #ff963d;
+    border-bottom-color: #ff963d;
+}
+
+html[data-a11y-theme="dark"] .extraContent h3 {
+    /* Texto */
+    color: #ff963d;
 }
 
 .extraContent table {

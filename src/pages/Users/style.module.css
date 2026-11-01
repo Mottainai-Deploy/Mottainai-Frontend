@@ -177,6 +177,11 @@
     background: #14211799;
 }
 
+html[data-a11y-theme="dark"] .modalBackdrop {
+    /* Aparência */
+    background: rgba(0, 0, 0, 0.6);
+}
+
 .modal {
     overflow-y: auto;
     width: min(100%, 34rem);
@@ -198,6 +203,11 @@
 .modalHeading h2 {
     font-size: 1.25rem;
     color: #234c31;
+}
+
+html[data-a11y-theme="dark"] .modalHeading h2 {
+    /* Texto */
+    color: #ff963d;
 }
 
 .closeButton {

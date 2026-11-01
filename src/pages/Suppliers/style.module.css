@@ -86,7 +86,7 @@
 
 .editHeader h2 {
     margin: 0;
-    color: var(--motta-light-blue);
+    color: var(--a11y-brand-text, var(--motta-light-blue));
     font-size: 1rem;
 }
 

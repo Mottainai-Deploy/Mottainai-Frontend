@@ -9,7 +9,7 @@
     border: 1px solid var(--a11y-card-border, rgba(var(--motta-blue-rgb), 0.12));
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(var(--motta-blue-rgb), 0.08);
-    color: var(--motta-blue);
+    color: var(--a11y-brand-text, var(--motta-blue));
 }
 
 .heading {
@@ -36,7 +36,7 @@
     padding: 6px 10px;
     background-color: rgba(45, 87, 120, 0.12);
     border-radius: 999px;
-    color: var(--motta-blue);
+    color: var(--a11y-brand-text, var(--motta-blue));
     font-size: 0.75rem;
     font-weight: 700;
     white-space: nowrap;
@@ -70,7 +70,7 @@
 
 .dataDetails summary {
     width: fit-content;
-    color: var(--motta-blue);
+    color: var(--a11y-brand-text, var(--motta-blue));
     font-weight: 700;
     cursor: pointer !important;
 }
@@ -125,7 +125,7 @@
 }
 
 .dataDetails time {
-    color: var(--motta-blue);
+    color: var(--a11y-brand-text, var(--motta-blue));
     font-weight: 700;
 }
 

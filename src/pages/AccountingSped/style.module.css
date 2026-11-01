@@ -3,7 +3,7 @@
     gap: clamp(1rem, 2.2vw, 1.5rem);
     width: 100%;
     min-width: 0;
-    color: var(--motta-blue);
+    color: var(--a11y-brand-text, var(--motta-blue));
 }
 
 .page header h1 {
@@ -329,9 +329,9 @@
 
 :global(html[data-a11y-theme="dark"]:not([data-a11y-contrast="high"]):not([data-a11y-contrast="low"])) .formatSelected {
     /* Aparência */
-    background-color: #ffbd70 !important;
+    background-color: #743300 !important;
     /* Texto */
-    color: var(--motta-light-blue) !important;
+    color: var(--a11y-brand-text, var(--motta-light-blue)) !important;
 }
 
 :global(html[data-a11y-theme="dark"]:not([data-a11y-contrast="high"]):not([data-a11y-contrast="low"])) .formatPicker input:checked {

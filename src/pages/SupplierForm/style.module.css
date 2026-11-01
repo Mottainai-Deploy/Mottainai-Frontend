@@ -23,7 +23,7 @@
 
 .eyebrow {
     margin: 0 0 0.35rem;
-    color: var(--motta-light-blue);
+    color: var(--a11y-brand-text, var(--motta-light-blue));
     font-size: 0.8rem;
     font-weight: 700;
 }

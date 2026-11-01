@@ -3,7 +3,8 @@ import type { ChangeEvent, FormEvent } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import AuthLayout from '@/components/AuthLayout';
 import styles from '@/components/AuthLayout/style.module.css';
-import lontraPensando from '@/assets/imgs/lontra-pensando.webp';
+import { useMinimumLoadingVisibility } from '@/hooks/useMinimumLoadingVisibility';
+import { waitForMinimumLoadingDuration } from '@/utils/minimumLoadingDuration';
 
 import type {
   PasswordRecoveryState,
@@ -39,6 +40,8 @@ function PasswordRecovery() {
     feedbackType: null,
     fieldErrors: {},
   });
+  const minimumLoadingVisible = useMinimumLoadingVisibility(state.isLoading);
+  const showLoading = state.isLoading || minimumLoadingVisible;
 
   function updateState(changes: Partial<PasswordRecoveryState>) {
     setState((previous) => ({ ...previous, ...changes }));
@@ -62,9 +65,11 @@ function PasswordRecovery() {
       return;
     }
 
+    const startedAt = performance.now();
     updateState({ isLoading: true, feedback: null, feedbackType: null });
     try {
       const response = await sendRecoveryCode(sanitizeRecoveryEmail(state.email));
+      await waitForMinimumLoadingDuration(startedAt);
       updateState({
         step: 'code',
         isLoading: false,
@@ -73,6 +78,7 @@ function PasswordRecovery() {
         fieldErrors: {},
       });
     } catch (error) {
+      await waitForMinimumLoadingDuration(startedAt);
       updateState({
         isLoading: false,
         feedback: error instanceof Error ? error.message : 'Não foi possível enviar o código.',
@@ -90,14 +96,17 @@ function PasswordRecovery() {
       return;
     }
 
+    const startedAt = performance.now();
     updateState({ isLoading: true, feedback: null, feedbackType: null });
     try {
       const response = await verifyRecoveryCode(sanitizeRecoveryEmail(state.email), sanitizeRecoveryCode(state.code));
+      await waitForMinimumLoadingDuration(startedAt);
       navigate(`/newPassword?token=${encodeURIComponent(response.resetToken)}`, {
         replace: true,
         state: { userEmail: state.email.trim() },
       });
     } catch (error) {
+      await waitForMinimumLoadingDuration(startedAt);
       updateState({
         isLoading: false,
         feedback: error instanceof Error ? error.message : 'Não foi possível verificar o código.',
@@ -114,7 +123,7 @@ function PasswordRecovery() {
     navigate('/login');
   }
 
-  const feedback = state.feedback ? (
+  const feedback = state.feedback && !showLoading ? (
     <p
       id={feedbackId}
       className={`${styles.feedbackMessage} ${state.feedbackType === 'error' ? styles.errorMessage : styles.successMessage}`}
@@ -130,17 +139,16 @@ function PasswordRecovery() {
       <AuthLayout
         title="Recupere sua senha"
         description="Informe seu e-mail e enviaremos um código para você criar uma nova senha."
-        mascotSrc={lontraPensando}
-        mascotAlt="Lontra mascote pensando durante a recuperação da senha"
+        artworkVariant="recovery-email"
       >
         <form
           className={styles.form}
           onSubmit={handleEmailSubmit}
           noValidate
-          aria-describedby={state.feedback ? feedbackId : undefined}
+          aria-describedby={!showLoading && state.feedback ? feedbackId : undefined}
         >
           {feedback}
-          {state.isLoading && (
+          {showLoading && (
             <p className={styles.codeHint} role="status" aria-live="polite">Enviando código...</p>
           )}
           <label htmlFor={emailFieldId} className={styles.visuallyHidden}>E-mail</label>
@@ -156,11 +164,11 @@ function PasswordRecovery() {
             onChange={handleEmailChange}
             maxLength={254}
             aria-invalid={Boolean(state.fieldErrors.email)}
-            aria-describedby={state.fieldErrors.email ? `${emailFieldId}-error` : state.feedback ? feedbackId : undefined}
+            aria-describedby={state.fieldErrors.email ? `${emailFieldId}-error` : !showLoading && state.feedback ? feedbackId : undefined}
           />
           {state.fieldErrors.email && <p id={`${emailFieldId}-error`} className={styles.errorMessage} role="alert">{state.fieldErrors.email}</p>}
-          <button type="submit" className={styles.submitButton} disabled={state.isLoading}>
-            {state.isLoading ? 'Enviando código...' : 'Enviar código'}
+          <button type="submit" className={styles.submitButton} disabled={state.isLoading || showLoading}>
+            {showLoading ? 'Enviando código...' : 'Enviar código'}
           </button>
           <button type="button" className={styles.backButton} onClick={handleBackToLogin}>
             Voltar para o login
@@ -174,17 +182,16 @@ function PasswordRecovery() {
     <AuthLayout
       title="Verifique seu e-mail"
       description="Digite o código que enviamos para confirmar sua identidade."
-      mascotSrc={lontraPensando}
-      mascotAlt="Lontra mascote pensando durante a recuperação da senha"
+      artworkVariant="recovery-code"
     >
       <form
         className={styles.form}
         onSubmit={handleCodeSubmit}
         noValidate
-        aria-describedby={state.feedback ? feedbackId : undefined}
+        aria-describedby={!showLoading && state.feedback ? feedbackId : undefined}
       >
         {feedback}
-        {state.isLoading && (
+        {showLoading && (
           <p className={styles.codeHint} role="status" aria-live="polite">Verificando código...</p>
         )}
         <label htmlFor={codeFieldId} className={styles.visuallyHidden}>Código de recuperação</label>
@@ -201,12 +208,12 @@ function PasswordRecovery() {
           value={state.code}
           onChange={handleCodeChange}
           aria-invalid={Boolean(state.fieldErrors.code)}
-          aria-describedby={state.fieldErrors.code ? `${codeFieldId}-error` : state.feedback ? feedbackId : undefined}
+          aria-describedby={state.fieldErrors.code ? `${codeFieldId}-error` : !showLoading && state.feedback ? feedbackId : undefined}
         />
         {state.fieldErrors.code && <p id={`${codeFieldId}-error`} className={styles.errorMessage} role="alert">{state.fieldErrors.code}</p>}
         <p className={styles.codeHint}>Para testar o fluxo, use o código 123456.</p>
-        <button type="submit" className={styles.submitButton} disabled={state.isLoading}>
-          {state.isLoading ? 'Verificando...' : 'Verificar código'}
+        <button type="submit" className={styles.submitButton} disabled={state.isLoading || showLoading}>
+          {showLoading ? 'Verificando...' : 'Verificar código'}
         </button>
         <button type="button" className={styles.secondaryButton} onClick={handleBackToEmail}>
           Usar outro e-mail

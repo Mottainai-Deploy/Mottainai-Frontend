@@ -41,13 +41,13 @@
 
 .comparison dt {
     margin-bottom: 8px;
-    color: var(--motta-blue);
+    color: var(--a11y-brand-text, var(--motta-blue));
     font-size: 0.875rem;
     font-weight: 700;
 }
 
 .comparison dd {
-    color: var(--motta-blue);
+    color: var(--a11y-brand-text, var(--motta-blue));
     font-size: 1rem;
 }
 
@@ -63,14 +63,14 @@
 
 .title {
     margin-bottom: 24px;
-    color: var(--motta-blue);
+    color: var(--a11y-brand-text, var(--motta-blue));
     font-size: clamp(1.75rem, 3vw, 2.5rem);
     line-height: 1.1;
 }
 
 .feedback {
     margin-top: 32px;
-    color: var(--motta-blue);
+    color: var(--a11y-brand-text, var(--motta-blue));
     font-size: 1rem;
 }
 

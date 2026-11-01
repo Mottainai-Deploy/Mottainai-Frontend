@@ -15,7 +15,7 @@
 
 .card h1 {
     margin: 0 0 1.25rem;
-    color: var(--motta-blue);
+    color: var(--a11y-brand-text, var(--motta-blue));
     font-size: clamp(1.25rem, 2.5vw, 1.75rem);
 }
 
@@ -39,7 +39,7 @@
 
 .tabs .active {
     border-bottom-color: var(--motta-light-blue);
-    color: var(--motta-blue);
+    color: var(--a11y-brand-text, var(--motta-blue));
 }
 
 .file-input {
@@ -101,7 +101,7 @@ input:focus-visible {
     height: 5.5rem;
     border-radius: 50%;
     background: #d9d9d9;
-    color: var(--motta-blue);
+    color: var(--a11y-brand-text, var(--motta-blue));
     font-size: 2rem;
 }
 
@@ -338,7 +338,7 @@ input:focus-visible {
 
 .modal header h2 {
     margin: 0;
-    color: var(--motta-light-blue);
+    color: var(--a11y-brand-text, var(--motta-light-blue));
 }
 
 .modal header button {
@@ -385,6 +385,32 @@ input:focus-visible {
     background: #d6fac9;
     color: #205c1c;
     font-size: 1.75rem;
+}
+
+html[data-a11y-theme="dark"] .backdrop {
+    /* Aparência */
+    background: rgba(0, 0, 0, 0.55);
+}
+
+html[data-a11y-theme="dark"] .success h2 {
+    /* Texto */
+    color: #ff963d;
+}
+
+html[data-a11y-theme="dark"] .success-icon {
+    /* Aparência */
+    background-color: #ff963d;
+
+    /* Texto */
+    color: #243746;
+}
+
+html[data-a11y-theme="dark"] .modal :global([data-tone="success"]) {
+    /* Aparência */
+    background-color: #ff963d;
+
+    /* Texto */
+    color: #243746;
 }
 
 @media (max-width: 680px) {
@@ -452,4 +478,16 @@ input:focus-visible {
     .dropzone {
         transition: none;
     }
+}
+
+:global(html[data-a11y-theme="dark"]) .upload-icon {
+    /* Aparência */
+    background-color: var(--a11y-surface-raised);
+}
+
+:global(html[data-a11y-theme="dark"]) .cancelButton:hover {
+    /* Aparência */
+    background-color: var(--a11y-surface-raised);
+    /* Texto */
+    color: #fff;
 }

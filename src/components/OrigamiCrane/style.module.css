@@ -1,0 +1,9 @@
+.crane {
+  /* Layout */
+  display: block;
+  overflow: visible;
+
+  /* Tamanho */
+  max-width: none;
+  aspect-ratio: auto;
+}

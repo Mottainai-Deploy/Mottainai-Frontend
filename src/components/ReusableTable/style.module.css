@@ -16,7 +16,7 @@
 
 .title {
     margin: 0 0 16px 16px;
-    color: var(--motta-light-blue);
+    color: var(--a11y-brand-text, var(--motta-light-blue));
     font-size: 1rem;
     font-weight: bolder;
     line-height: 1.4;
@@ -112,14 +112,15 @@
 
 .info {
     background-color: #dcebf5;
-    color: var(--motta-blue);
+    color: var(--a11y-brand-text, var(--motta-blue));
 }
 
+:global(html[data-a11y-theme="dark"]) .neutral,
 :global(html[data-a11y-theme="dark"]) .info {
     /* Aparência */
-    background-color: #d6e8f3;
+    background-color: var(--a11y-surface-raised);
     /* Texto */
-    color: #102a43;
+    color: #fff;
 }
 
 :global(html[data-a11y-theme="dark"]) .table {

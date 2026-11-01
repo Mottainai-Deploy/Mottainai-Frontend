@@ -1,11 +1,11 @@
-import { useEffect, useId, useState } from 'react';
+import { useId, useLayoutEffect, useRef, useState } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
 import type { LoginFormState } from '@/types/login.types';
 import { useLocation, useNavigate } from 'react-router-dom';
 import AuthLayout from '@/components/AuthLayout';
 import styles from '@/components/AuthLayout/style.module.css';
-import lontraExplicando from '@/assets/imgs/lontra-explicando.webp';
 import { useAuth } from '@/hooks/useAuth'
+import { useMinimumLoadingVisibility } from '@/hooks/useMinimumLoadingVisibility';
 import  Loading  from '@/components/Loading'
 import { sanitizeLoginCredentials, validateLoginCredentials } from '@/utils/loginValidation';
 
@@ -22,13 +22,21 @@ export function Login() {
     });
 
     const { login, isLoggingIn, error, isAuthenticated } = useAuth();
+    const isLoginLoadingVisible = useMinimumLoadingVisibility(isLoggingIn);
+    const hasSubmittedLogin = useRef(false);
 
     const location = useLocation();
     const navigate = useNavigate();
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         if (isAuthenticated) {
-            navigate('/home', { state: { from: location }, replace: true });
+            navigate('/home', {
+                state: {
+                    from: location,
+                    showPostLoginLoading: hasSubmittedLogin.current,
+                },
+                replace: true,
+            });
         }
     }, [isAuthenticated, navigate, location]);
 
@@ -59,10 +67,15 @@ export function Login() {
             });
             return;
         }
+        hasSubmittedLogin.current = true;
         await login(sanitizeLoginCredentials(credentials));
     }
 
-    if (isLoggingIn) {
+    if (isAuthenticated) {
+        return null;
+    }
+
+    if (isLoggingIn || isLoginLoadingVisible) {
         return (<Loading></Loading>)
     }
 
@@ -70,8 +83,7 @@ export function Login() {
     <AuthLayout
         title="Bem-vindo de volta!"
         description="Simplificando seu estoque, tudo em um mesmo lugar."
-        mascotSrc={lontraExplicando}
-        mascotAlt="Lontra mascote explicando o sistema"
+      artworkVariant="login"
     >
         <form
             className={styles.form}
@@ -80,7 +92,7 @@ export function Login() {
             aria-describedby={error ? errorMessageId : undefined}
         >
             {error && (
-            <p id={errorMessageId} role="alert" className={styles.errorMessage}>
+            <p id={errorMessageId} role="alert" className={styles.errorMessage} data-a11y-light-surface="true">
                 {error}
             </p>
             )}
@@ -102,7 +114,7 @@ export function Login() {
             aria-invalid={Boolean(formData.errors.userEmail)}
             aria-describedby={formData.errors.userEmail ? `${userEmailFieldId}-error` : undefined}
             />
-            {formData.errors.userEmail && <p id={`${userEmailFieldId}-error`} className={styles.errorMessage} role="alert">{formData.errors.userEmail}</p>}
+            {formData.errors.userEmail && <p id={`${userEmailFieldId}-error`} className={styles.errorMessage} role="alert" data-a11y-light-surface="true">{formData.errors.userEmail}</p>}
 
             <label htmlFor={passwordFieldId} className={styles.visuallyHidden}>
             Senha
@@ -147,7 +159,7 @@ export function Login() {
                 </svg>
             </button>
             </div>
-            {formData.errors.password && <p id={`${passwordFieldId}-error`} className={styles.errorMessage} role="alert">{formData.errors.password}</p>}
+            {formData.errors.password && <p id={`${passwordFieldId}-error`} className={styles.errorMessage} role="alert" data-a11y-light-surface="true">{formData.errors.password}</p>}
 
             <button
             type="button"

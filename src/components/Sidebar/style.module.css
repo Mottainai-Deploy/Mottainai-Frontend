@@ -158,7 +158,7 @@
     padding: 0 10px;
     background-color: var(--a11y-surface, var(--main-white)) !important;
     border-radius: 30px;
-    color: var(--motta-blue) !important;
+    color: var(--a11y-brand-text, var(--motta-blue)) !important;
     font-size: 0.85rem;
     font-weight: 700;
     transition: background-color calc(0.2s * var(--a11y-motion-factor, 1)) ease,
@@ -194,7 +194,9 @@
     background-color: var(--a11y-surface, var(--main-white)) !important;
     border-radius: 10px;
     box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
-    color: var(--motta-blue) !important;
+    color: var(--a11y-brand-text, var(--motta-blue)) !important;
+    /* Efeitos */
+    transition: all 0.3s ease-in-out;
 }
 
 .sidebar-logout .icon {
@@ -279,6 +281,14 @@
 :global(html[data-a11y-theme="dark"]) .sidebar-logout:focus-visible {
     /* Texto */
     color: var(--motta-orange) !important;
+}
+
+:global(html[data-a11y-theme="dark"]:not([data-a11y-contrast="high"])) .sidebar-logout:hover,
+:global(html[data-a11y-theme="dark"]:not([data-a11y-contrast="high"])) .sidebar-logout:focus-visible {
+    /* Aparência */
+    background-color: var(--motta-light-orange) !important;
+    /* Efeitos */
+    opacity: 1 !important;
 }
 
 :global(html[data-a11y-theme="dark"][data-a11y-contrast="high"]) .sidebar-logout:hover,

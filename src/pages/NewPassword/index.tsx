@@ -5,7 +5,7 @@ import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import AuthLayout from '@/components/AuthLayout';
 import styles from '@/components/AuthLayout/style.module.css';
-import lontraOrgulhosa from '@/assets/imgs/lontra-orgulhosa.webp';
+import { waitForMinimumLoadingDuration } from '@/utils/minimumLoadingDuration';
 import type {
   NewPasswordState,
 } from '@/types/password-recovery.types';
@@ -56,11 +56,14 @@ function NewPassword() {
       return;
     }
 
+    const startedAt = performance.now();
     setState((previous) => ({ ...previous, isLoading: true, feedback: null, feedbackType: null, validationErrors: {} }));
     try {
       const response = await resetPassword(resetToken, sanitizeNewPassword(state.form.password));
+      await waitForMinimumLoadingDuration(startedAt);
       setState((previous) => ({ ...previous, isLoading: false, feedback: response.message, feedbackType: 'success', validationErrors: {} }));
     } catch (error) {
+      await waitForMinimumLoadingDuration(startedAt);
       setState((previous) => ({
         ...previous,
         isLoading: false,
@@ -74,6 +77,10 @@ function NewPassword() {
     navigate('/login');
   }
 
+  function handleRequestNewCode() {
+    navigate('/passwordRecovery');
+  }
+
   const feedback = state.feedback ? (
     <p
       id={feedbackId}
@@ -85,18 +92,26 @@ function NewPassword() {
     </p>
   ) : null;
 
-  if (!resetToken || state.feedbackType === 'success') {
+  const isExpiredResetLink = state.feedbackType === 'error'
+    && state.feedback === 'Sua sessão de recuperação expirou. Solicite um novo código.';
+
+  if (!resetToken || isExpiredResetLink || state.feedbackType === 'success') {
+    const passwordUpdated = state.feedbackType === 'success';
+
     return (
       <AuthLayout
-        title={state.feedbackType === 'success' ? 'Tudo certo!' : 'Link inválido'}
-        description={state.feedbackType === 'success' ? 'Sua senha foi atualizada.' : 'Solicite um novo código para continuar.'}
-        mascotSrc={lontraOrgulhosa}
-        mascotAlt="Lontra mascote orgulhosa"
+        title={passwordUpdated ? 'Tudo certo!' : 'Link inválido'}
+        description={passwordUpdated ? 'Sua senha foi atualizada.' : 'Solicite um novo código para continuar.'}
+        artworkVariant={passwordUpdated ? 'password-updated' : 'invalid-link'}
       >
         <div className={styles.form} aria-describedby={state.feedback ? feedbackId : undefined}>
           {feedback}
-          <button type="button" className={styles.submitButton} onClick={handleBackToLogin}>
-            Ir para o login
+          <button
+            type="button"
+            className={styles.submitButton}
+            onClick={passwordUpdated ? handleBackToLogin : handleRequestNewCode}
+          >
+            {passwordUpdated ? 'Ir para o login' : 'Solicitar novo código'}
           </button>
         </div>
       </AuthLayout>
@@ -107,8 +122,7 @@ function NewPassword() {
     <AuthLayout
       title="Crie uma nova senha"
       description="Escolha uma senha segura para voltar a acessar sua conta."
-      mascotSrc={lontraOrgulhosa}
-      mascotAlt="Lontra mascote orgulhosa"
+      artworkVariant="new-password"
     >
       <form
         className={styles.form}

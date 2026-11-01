@@ -101,6 +101,18 @@ img {
     object-fit: contain;
 }
 
+@media (prefers-reduced-motion: no-preference) {
+    table .table-action-transition {
+        /* Efeitos */
+        transition: all 0.3s ease-in-out;
+    }
+}
+
+html[data-a11y-theme="dark"] table a.a11y-table-action {
+    /* Aparência */
+    border: 1px solid #fff;
+}
+
 input,
 select,
 textarea,

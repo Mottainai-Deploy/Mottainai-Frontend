@@ -17,6 +17,7 @@ import {
   getManagementReportPreferences,
   saveManagementReportPreference,
 } from '@/services/managementReportPreferencesService';
+import { useMinimumLoadingVisibility } from '@/hooks/useMinimumLoadingVisibility';
 import {
   buildMonthlyFinancialReportItems,
   createMonthlyFinancialReport,
@@ -62,6 +63,20 @@ function AccountingSped() {
   const storeId = useId();
   const formatId = useId();
   const [state, setState] = useState<MonthlyFinancialReportPageState>(initialState);
+  const minimumReportsLoadingVisible = useMinimumLoadingVisibility(state.isLoadingReports);
+  const minimumPreferenceSavingVisible = useMinimumLoadingVisibility(state.isSavingPreference);
+  const minimumReportGeneratingVisible = useMinimumLoadingVisibility(state.isGenerating);
+  const showReportsLoading = state.isLoadingReports || minimumReportsLoadingVisible;
+  const showPreferenceSaving = state.isSavingPreference || minimumPreferenceSavingVisible;
+  const showReportGenerating = state.isGenerating || minimumReportGeneratingVisible;
+  const hasVisibleLoading = showReportsLoading || showPreferenceSaving || showReportGenerating;
+  const displayedFeedback = showReportsLoading
+    ? ''
+    : showPreferenceSaving
+      ? 'Salvando preferência de formato…'
+      : showReportGenerating
+        ? 'Gerando e salvando relatório financeiro…'
+        : state.feedback;
   const [detailsDialog, setDetailsDialog] =
     useState<OpenDetailsDialog<MonthlyFinancialReport> | null>(null);
   const handleCloseDetails = useCallback(() => setDetailsDialog(null), []);
@@ -248,7 +263,7 @@ function AccountingSped() {
             </div>
           </div>
 
-          <fieldset className={styles.formatPicker} disabled={state.isLoadingReports || state.isGenerating || state.isSavingPreference}>
+          <fieldset className={styles.formatPicker} disabled={state.isLoadingReports || state.isGenerating || state.isSavingPreference || showReportsLoading || showReportGenerating || showPreferenceSaving}>
             <legend>Formato de exportação</legend>
             <div className={styles.formatOptions}>
               <label className={state.format === 'pdf' ? styles.formatSelected : styles.formatOption} htmlFor={`${formatId}-pdf`}>
@@ -262,8 +277,8 @@ function AccountingSped() {
             </div>
           </fieldset>
           <div className={styles.actions}>
-            <button type="submit" className={styles.primaryButton} disabled={state.isLoadingReports || state.isGenerating || state.isSavingPreference}>
-              {state.isGenerating ? 'Gerando…' : `Gerar e exportar ${state.format.toUpperCase()}`}
+            <button type="submit" className={styles.primaryButton} disabled={state.isLoadingReports || state.isGenerating || state.isSavingPreference || showReportsLoading || showReportGenerating || showPreferenceSaving}>
+              {showReportGenerating ? 'Gerando…' : `Gerar e exportar ${state.format.toUpperCase()}`}
             </button>
           </div>
         </form>
@@ -271,8 +286,8 @@ function AccountingSped() {
         <p className={styles.helper}>
           {items.length.toLocaleString('pt-BR')} divergências no recorte. A soma dos valores cadastrados é apresentada sem classificá-la como lucro ou prejuízo.
         </p>
-        {state.feedback && <p className={styles.success} role="status">{state.feedback}</p>}
-        {state.error && <p className={styles.error} role="alert">{state.error}</p>}
+        {displayedFeedback && <p className={styles.success} role="status">{displayedFeedback}</p>}
+        {!hasVisibleLoading && state.error && <p className={styles.error} role="alert">{state.error}</p>}
 
         {items.length > 0 && (
           <>
@@ -299,8 +314,8 @@ function AccountingSped() {
       <section className={styles.card} aria-labelledby="saved-financial-reports-title">
         <h2 id="saved-financial-reports-title">Relatórios financeiros salvos neste navegador</h2>
         <p>Os relatórios ficam armazenados por até um ano.</p>
-        {state.isLoadingReports && <p role="status">Carregando relatórios salvos…</p>}
-        {!state.isLoadingReports && state.reports.length > 0 && (
+        {showReportsLoading && <p role="status">Carregando relatórios salvos…</p>}
+        {!showReportsLoading && state.reports.length > 0 && (
           <div className={styles.tableWrap}>
             <table>
               <caption className={styles.srOnly}>Relatórios financeiros mensais salvos neste navegador</caption>
@@ -315,7 +330,7 @@ function AccountingSped() {
                     <div className={styles.reportActions}>
                       <button
                         type="button"
-                        className={styles.viewButton}
+                        className={`${styles.viewButton} table-action-transition`}
                         aria-label={`Ver relatório financeiro de ${report.monthLabel}`}
                         aria-haspopup="dialog"
                         onClick={(event) => setDetailsDialog({ record: report, trigger: event.currentTarget })}
@@ -332,7 +347,7 @@ function AccountingSped() {
             </table>
           </div>
         )}
-        {!state.isLoadingReports && state.reports.length === 0 && <p className={styles.emptyState}>Nenhum relatório financeiro foi salvo ainda.</p>}
+        {!showReportsLoading && state.reports.length === 0 && <p className={styles.emptyState}>Nenhum relatório financeiro foi salvo ainda.</p>}
       </section>
 
       <section className={styles.printArea} aria-label="Relatório financeiro para impressão">
