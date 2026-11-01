@@ -19,12 +19,10 @@
 [![ESLint](https://img.shields.io/badge/ESLint-9.39.5-4B32C3?style=flat-square&logo=eslint&logoColor=white)](eslint.config.js)
 [![Nginx](https://img.shields.io/badge/Nginx-1.27--alpine-009639?style=flat-square&logo=nginx&logoColor=white)](Dockerfile)
 [![GitHub Actions](https://img.shields.io/badge/CI-GitHub%20Actions-2088FF?style=flat-square&logo=githubactions&logoColor=white)](.github/workflows/ci.yml)
-[![Status](https://img.shields.io/badge/status-protótipo%20sem%20backend-orange?style=flat-square)](#2-estado-atual-do-projeto)
 
 <br/>
 
 [Visão geral](#1-visão-geral) •
-[Estado atual](#2-estado-atual-do-projeto) •
 [Arquitetura](#3-arquitetura) •
 [Tecnologias](#4-tecnologias) •
 [Telas](#6-funcionalidades-e-rotas) •
@@ -57,47 +55,6 @@ Este repositório guarda o **frontend web administrativo** (`sistema-mottainai` 
 
 ---
 
-## 2. Estado atual do projeto
-
-Análise da branch **`main`**, a branch padrão observada (`origin/main`). Commit analisado: `5ca32b7` (*fix: Housekeeping*, 2026-10-26).
-
-| Item | Status |
-|---|:---:|
-| Layout principal, sidebar, header e navegação por pastas | ![pronto](https://img.shields.io/badge/-pronto-success?style=flat-square) |
-| Telas de produtos, estoque, relatórios, contabilidade e usuários | ![pronto (mock)](https://img.shields.io/badge/-pronto%20(mock)-yellow?style=flat-square) |
-| Widget de acessibilidade + leitura em voz alta (Web Speech API) | ![pronto](https://img.shields.io/badge/-pronto-success?style=flat-square) |
-| Validação e sanitização de formulários (`src/utils/*Validation.ts`) | ![pronto](https://img.shields.io/badge/-pronto-success?style=flat-square) |
-| Testes (node:test + Vitest) e CI de build, lint e convenção de commits | ![pronto](https://img.shields.io/badge/-pronto-success?style=flat-square) |
-| Imagem Docker de QA (Nginx) | ![pronto](https://img.shields.io/badge/-pronto-success?style=flat-square) |
-| Autenticação real (backend) | ![pendente](https://img.shields.io/badge/-pendente-orange?style=flat-square) |
-| Integração com as APIs do Mottainai (produtos, estoque, motor de IA) | ![pendente](https://img.shields.io/badge/-pendente-orange?style=flat-square) |
-| Deploy público | ![não confirmado](https://img.shields.io/badge/-não%20confirmado-lightgrey?style=flat-square) |
-
-<details>
-<summary><b>Histórico recente da main (últimos commits)</b></summary>
-
-<br/>
-
-```text
-5ca32b7 fix: Housekeeping
-a3e5302 ci: build local frontend QA preview
-b55f528 feat: add the accessibility button to the project
-2a01d74 fix: fix the project to attend to the requirements
-7e5efaa feat: add the administration of users in the project
-e8d7558 feat: add the contability flow to the project
-d60613e fix: fix the code to be more similar to the design
-66408e9 feat: Transfer flow
-493c331 feat: add the stock page
-03f9019 feat: add the page habits of consume
-c72ba13 feat: add the product flow
-...
-8de3dd7 feat: create home interface without true data
-```
-
-</details>
-
----
-
 ## 3. Arquitetura
 
 ### Visão de componentes
@@ -122,7 +79,6 @@ flowchart TB
     end
 
     API["APIs Mottainai<br/>(não integradas)"]
-    SVC -. "pendente" .-> API
 
     classDef pending fill:#eee,stroke:#999,stroke-dasharray: 5 5,color:#555
     class API pending
@@ -486,21 +442,7 @@ Não há deploy automatizado (Firebase, Vercel, S3 ou similar) configurado no re
 
 ---
 
-## 12. Roadmap e contribuição
-
-### Próximos passos sugeridos
-
-*Inferidos do estado do código e do README. Não há roadmap formal no repositório.*
-
-- [x] Layout, navegação e telas principais
-- [x] Widget de acessibilidade e testes estáticos de a11y
-- [x] Validação de formulários, CI e imagem de QA
-- [ ] Definir o contrato e o endereço das APIs (auth, produtos, estoque, motor de IA)
-- [ ] Autenticação real com cookie `HttpOnly` e papéis por rota
-- [ ] Trocar `src/data/*` e os mocks de `src/services/*` por chamadas reais
-- [ ] Persistir relatórios no backend em vez do IndexedDB
-- [ ] Versionar ou remover os scripts de Lighthouse
-- [ ] Atualizar `qa/README.md` para refletir o mock só em dev
+## 12. Contribuição
 
 ### Convenções para contribuir
 
