@@ -45,7 +45,7 @@
   aspect-ratio: 1;
 
   /* Aparência */
-  background-color: #fff;
+  background-color: var(--main-white);
   border-radius: 50%;
 }
 
@@ -133,24 +133,7 @@
 }
 
 .visuallyHidden {
-  /* Layout */
-  position: absolute;
-  overflow: hidden;
-
-  /* Tamanho */
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-
-  /* Aparência */
-  border: 0;
-
-  /* Texto */
-  white-space: nowrap;
-
-  /* Efeitos */
-  clip-path: inset(50%);
+    composes: visually-hidden from global;
 }
 
 @keyframes flightLoop {

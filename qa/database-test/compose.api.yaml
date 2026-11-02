@@ -1,0 +1,11 @@
+services:
+  api:
+    environment:
+      DB_URL: ${TEST_API_DB_URL:?Execute connect-api.ps1}
+    networks:
+      - test_database
+
+networks:
+  test_database:
+    external: true
+    name: mottainai-database-test_default

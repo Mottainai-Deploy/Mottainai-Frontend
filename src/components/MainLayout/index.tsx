@@ -7,7 +7,6 @@ import {
   FOLDER_NAVIGATION_PATHS,
   FOLDER_NAVIGATION_ITEMS,
   STOCK_FOLDER_NAVIGATION_ITEMS,
-  ACCOUNTING_FOLDER_NAVIGATION_ITEMS,
   USERS_FOLDER_NAVIGATION_ITEMS,
 } from "@/config/folder-navigation";
 import styles from "./style.module.css";
@@ -18,7 +17,6 @@ const PAGE_TITLES: Record<string, string> = {
   "/users": "Usuários",
   "/account": "Minha conta",
   "/products": "Produtos",
-  "/usageHistory": "Histórico de Uso",
   "/expiringProducts": "Produtos a Vencer",
   "/productsRegistration": "Cadastro de Produtos",
   "/stock": "Estoque",
@@ -28,8 +26,6 @@ const PAGE_TITLES: Record<string, string> = {
   "/stock/transfers/new": "Nova transferência",
   "/stock/suppliers": "Fornecedores",
   "/stock/suppliers/new": "Novo fornecedor",
-  "/managementReports": "Relatórios Gerenciais",
-  "/accounting/sped": "Contabilidade/SPED",
 };
 
 function MainLayout() {
@@ -37,8 +33,6 @@ function MainLayout() {
   const normalizedPathname = pathname.replace(/\/+$/, "") || "/";
   const pageTitle = normalizedPathname.startsWith("/products/")
     ? "Detalhes do Produto"
-    : normalizedPathname.startsWith("/stock/cash-closing/")
-      ? "Relatório de fechamento de caixa"
     : normalizedPathname.startsWith("/users/")
       ? "Usuários"
     : (PAGE_TITLES[normalizedPathname] ?? "Mottainai");
@@ -48,18 +42,14 @@ function MainLayout() {
   }, [pageTitle]);
   const isStockFlowActive =
     normalizedPathname === "/stock" || normalizedPathname.startsWith("/stock/");
-  const isAccountingFlowActive =
-    normalizedPathname === "/managementReports" || normalizedPathname === "/accounting/sped";
   const isUsersFlowActive = normalizedPathname === "/users" || normalizedPathname.startsWith("/users/");
   const showFolderNavigation =
-    isStockFlowActive || isAccountingFlowActive || isUsersFlowActive || FOLDER_NAVIGATION_PATHS.includes(normalizedPathname);
+    isStockFlowActive || isUsersFlowActive || FOLDER_NAVIGATION_PATHS.includes(normalizedPathname);
   const folderNavigationItems = isStockFlowActive
     ? STOCK_FOLDER_NAVIGATION_ITEMS
-    : isAccountingFlowActive
-      ? ACCOUNTING_FOLDER_NAVIGATION_ITEMS
-      : isUsersFlowActive
-        ? USERS_FOLDER_NAVIGATION_ITEMS
-        : FOLDER_NAVIGATION_ITEMS;
+    : isUsersFlowActive
+      ? USERS_FOLDER_NAVIGATION_ITEMS
+      : FOLDER_NAVIGATION_ITEMS;
 
   return (
     <div className={styles.layout}>
@@ -74,11 +64,9 @@ function MainLayout() {
             items={folderNavigationItems}
             ariaLabel={isStockFlowActive
               ? "Seções de estoque"
-              : isAccountingFlowActive
-                ? "Seções de contabilidade"
-                : isUsersFlowActive
-                  ? "Seções de usuários e permissões"
-                  : "Seções de análise"}
+              : isUsersFlowActive
+                ? "Seções de usuários e permissões"
+                : "Seções de análise"}
           />
         )}
         <main

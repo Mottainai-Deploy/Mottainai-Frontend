@@ -140,7 +140,7 @@
 html[data-a11y-theme="dark"] .detailRow dt {
     /* Texto */
     font-weight: 700;
-    color: #ff963d;
+    color: var(--motta-highlight-orange);
 }
 
 .detailRow dd {
@@ -166,18 +166,18 @@ html[data-a11y-theme="dark"] .detailRow dt {
 html[data-a11y-theme="dark"] .eyebrow,
 html[data-a11y-theme="dark"] .closeButton {
     /* Texto */
-    color: #ff963d;
+    color: var(--motta-highlight-orange);
 }
 
 html[data-a11y-theme="dark"] .details {
     /* Aparência */
-    border-top-color: #ff963d;
-    border-bottom-color: #ff963d;
+    border-top-color: var(--motta-highlight-orange);
+    border-bottom-color: var(--motta-highlight-orange);
 }
 
 html[data-a11y-theme="dark"] .extraContent h3 {
     /* Texto */
-    color: #ff963d;
+    color: var(--motta-highlight-orange);
 }
 
 .extraContent table {

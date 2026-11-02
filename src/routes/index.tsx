@@ -1,5 +1,5 @@
 import { lazy, Suspense, useCallback, useContext, useLayoutEffect, useRef, useState, type ReactNode } from "react";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation, useSearchParams } from "react-router-dom";
 import PrivateRoute from "@/pages/PrivateRoute";
 import RouteLoadErrorBoundary from "@/components/RouteLoadErrorBoundary";
 import Loading from "@/components/Loading";
@@ -26,16 +26,11 @@ const ErrorPage = lazy(() => loadModuleWithMinimumDuration(() => import("@/pages
 const Overview = lazy(() => loadModuleWithMinimumDuration(() => import("@/pages/Overview")));
 const Users = lazy(() => loadModuleWithMinimumDuration(() => import("@/pages/Users")));
 const ExpiringProducts = lazy(() => loadModuleWithMinimumDuration(() => import("@/pages/ExpiringProducts")));
-const PasswordRecovery = lazy(() => loadModuleWithMinimumDuration(() => import("@/pages/PasswordRecovery")));
-const UsageHistory = lazy(() => loadModuleWithMinimumDuration(() => import("@/pages/UsageHistory")));
 const ProductsRegistration = lazy(() => loadModuleWithMinimumDuration(() => import("@/pages/ProductsRegistration")));
-const NewPassword = lazy(() => loadModuleWithMinimumDuration(() => import("@/pages/NewPassword")));
+const ActivateAccess = lazy(() => loadModuleWithMinimumDuration(() => import("@/pages/ActivateAccess")));
 const Products = lazy(() => loadModuleWithMinimumDuration(() => import("@/pages/Products")));
 const ProductDetails = lazy(() => loadModuleWithMinimumDuration(() => import("@/pages/ProductDetails")));
-const ManagementReports = lazy(() => loadModuleWithMinimumDuration(() => import("@/pages/ManagementReports")));
-const AccountingSped = lazy(() => loadModuleWithMinimumDuration(() => import("@/pages/AccountingSped")));
 const Stock = lazy(() => loadModuleWithMinimumDuration(() => import("@/pages/Stock")));
-const CashClosingReport = lazy(() => loadModuleWithMinimumDuration(() => import("@/pages/CashClosingReport")));
 const NewStockCount = lazy(() => loadModuleWithMinimumDuration(() => import("@/pages/NewStockCount")));
 const StockTransfers = lazy(() => loadModuleWithMinimumDuration(() => import("@/pages/StockTransfers")));
 const NewTransfer = lazy(() => loadModuleWithMinimumDuration(() => import("@/pages/NewTransfer")));
@@ -49,6 +44,13 @@ function RouteSuspenseFallback() {
 
   if (isTransitioning) return null;
   return <Loading />;
+}
+
+function StockAdjustmentsRoute() {
+  const [params] = useSearchParams();
+  const value = params.get('donationId') ?? '';
+  const trackedDonationId = /^[1-9]\d*$/.test(value) && Number.isSafeInteger(Number(value)) ? Number(value) : null;
+  return <StockAdjustments trackedDonationId={trackedDonationId} />;
 }
 
 function page(element: ReactNode, onLoadError?: () => void) {
@@ -145,9 +147,8 @@ function RouteContent() {
             <Route path="/" element={page(<Login />)} />
             <Route path="/login" element={page(<Login />)} />
 
-            {/* Fluxo público de recuperação de senha */}
-            <Route path="/passwordRecovery" element={page(<PasswordRecovery />)} />
-            <Route path="/newPassword" element={page(<NewPassword />)} />
+            {/* Ativação de acesso por convite */}
+            <Route path="/activate-access" element={page(<ActivateAccess />)} />
 
             {/* Rotas Privadas */}
             <Route element={<PrivateRoute />}>
@@ -161,22 +162,17 @@ function RouteContent() {
                   )}
                 />
                 <Route path="/users/*" element={page(<Users />)} />
-                <Route path="/usageHistory" element={page(<UsageHistory />)} />
                 <Route path="/expiringProducts" element={page(<ExpiringProducts />)} />
                 <Route path="/products" element={page(<Products />)} />
                 <Route path="/products/:productId" element={page(<ProductDetails />)} />
                 <Route path="/stock" element={page(<Stock />)} />
-                <Route
-                  path="/stock/cash-closing/:discrepancyId"
-                  element={page(<CashClosingReport />)}
-                />
                 <Route
                   path="/stock/counts/new"
                   element={page(<NewStockCount />)}
                 />
                 <Route
                   path="/stock/damages"
-                  element={page(<StockAdjustments />)}
+                  element={page(<StockAdjustmentsRoute />)}
                 />
                 <Route
                   path="/stock/transfers"
@@ -188,8 +184,6 @@ function RouteContent() {
                   element={page(<Suppliers />)}
                 />
                 <Route path="/stock/suppliers/new" element={page(<SupplierForm />)} />
-                <Route path="/managementReports" element={page(<ManagementReports />)} />
-                <Route path="/accounting/sped" element={page(<AccountingSped />)} />
                 <Route
                   path="/productsRegistration"
                   element={page(<ProductsRegistration />)}

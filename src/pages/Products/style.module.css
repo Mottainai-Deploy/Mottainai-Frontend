@@ -115,13 +115,13 @@
 }
 
 .attention {
-    background: #ffe7b0;
-    color: #8a5200;
+    background: var(--a11y-status-warning-surface);
+    color: var(--a11y-status-warning-text);
 }
 
 .critical {
-    background: #f9dfe1;
-    color: #8f151b;
+    background: var(--a11y-status-critical-surface);
+    color: var(--a11y-status-critical-text);
 }
 
 .view-button {
@@ -133,8 +133,8 @@
     max-height: 5rem;
     padding: 0.3rem 0.65rem;
     border-radius: 0.3rem;
-    background: #ded8d0;
-    border: 1px solid #ded8d0;
+    background: var(--a11y-action-surface);
+    border: 1px solid var(--a11y-action-border);
     color: var(--a11y-text-muted, #373431);
     font: inherit;
     font-weight: 500;
@@ -179,14 +179,7 @@
 }
 
 .sr-only {
-    position: absolute;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    border: 0;
-    white-space: nowrap;
+    composes: visually-hidden from global;
 }
 
 @media (max-width: 768px) {

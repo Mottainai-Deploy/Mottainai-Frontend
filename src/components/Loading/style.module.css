@@ -13,7 +13,7 @@
   padding: clamp(1rem, 4vw, 3rem);
 
   /* Aparência */
-  background-color: var(--main-white, #fff);
+  background-color: var(--main-white, var(--main-white));
 
   /* Texto */
   color: var(--a11y-brand-text, var(--motta-blue, #102a43));

@@ -20,10 +20,14 @@
 }
 
 .content {
+    /* Tamanho */
     min-height: calc(100vh - 64px);
     min-height: calc(100dvh - 64px);
     min-width: 0;
-    padding: clamp(1rem, 2.4vw, 2rem) clamp(1rem, 3vw, 2.5rem);
+    padding-block: clamp(1rem, 2.4vw, 2rem);
+    padding-inline: clamp(1.5rem, 4vw, 3.5rem);
+
+    /* Texto */
     color: var(--a11y-brand-text, var(--motta-blue));
 }
 
@@ -39,7 +43,8 @@
     .content {
         min-height: calc(100vh - 64px);
         min-height: calc(100dvh - 64px);
-        padding: clamp(1rem, 3vw, 1.5rem);
+        padding-block: clamp(1rem, 3vw, 1.5rem);
+        padding-inline: clamp(1.5rem, 4vw, 2rem);
     }
     .content-with-folders {
         min-height: calc(100vh - 102px);
@@ -53,7 +58,8 @@
         min-height: calc(100dvh - 122px);
     }
     .content {
-        padding: 1rem;
+        padding-block: 1rem;
+        padding-inline: clamp(1.25rem, 4vw, 1.5rem);
     }
 }
 

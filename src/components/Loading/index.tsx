@@ -6,10 +6,11 @@ import styles from './style.module.css';
 function Loading() {
     useEffect(() => {
         const previousTitle = document.title;
-        document.title = 'Carregando | Mottainai';
+        const loadingTitle = 'Carregando | Mottainai';
+        document.title = loadingTitle;
 
         return () => {
-            document.title = previousTitle;
+            if (document.title === loadingTitle) document.title = previousTitle;
         };
     }, []);
 

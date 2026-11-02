@@ -21,12 +21,12 @@ export function Login() {
         errors: {},
     });
 
-    const { login, isLoggingIn, error, isAuthenticated } = useAuth();
+    const { login, isLoggingIn, error, isAuthenticated, notice } = useAuth();
     const isLoginLoadingVisible = useMinimumLoadingVisibility(isLoggingIn);
     const hasSubmittedLogin = useRef(false);
-
     const location = useLocation();
     const navigate = useNavigate();
+    useLayoutEffect(() => { document.getElementById('login-password-changed')?.focus(); }, [location.key, isAuthenticated, notice]);
 
     useLayoutEffect(() => {
         if (isAuthenticated) {
@@ -50,10 +50,6 @@ export function Login() {
 
     function handleTogglePasswordVisibility() {
         setFormData((previous) => ({ ...previous, isPasswordVisible: !previous.isPasswordVisible }));
-    }
-
-    function handleForgotPassword() {
-        navigate('/passwordRecovery', { state: { from: location, userEmail: formData.userEmail } });
     }
 
     async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -91,14 +87,15 @@ export function Login() {
             noValidate
             aria-describedby={error ? errorMessageId : undefined}
         >
+            {(notice === 'password-changed' || (typeof location.state === 'object' && location.state !== null && 'passwordChanged' in location.state && location.state.passwordChanged === true)) && <p id="login-password-changed" tabIndex={-1} role="status">Senha operacional alterada. Entre novamente com sua senha de acesso Firebase.</p>}
             {error && (
             <p id={errorMessageId} role="alert" className={styles.errorMessage} data-a11y-light-surface="true">
                 {error}
             </p>
             )}
 
-            <label htmlFor={userEmailFieldId} className={styles.visuallyHidden}>
-            Email de Usuário
+            <label htmlFor={userEmailFieldId}>
+            E-mail
             </label>
             <input
             id={userEmailFieldId}
@@ -116,7 +113,7 @@ export function Login() {
             />
             {formData.errors.userEmail && <p id={`${userEmailFieldId}-error`} className={styles.errorMessage} role="alert" data-a11y-light-surface="true">{formData.errors.userEmail}</p>}
 
-            <label htmlFor={passwordFieldId} className={styles.visuallyHidden}>
+            <label htmlFor={passwordFieldId}>
             Senha
             </label>
             <div className={styles.passwordField}>
@@ -160,14 +157,6 @@ export function Login() {
             </button>
             </div>
             {formData.errors.password && <p id={`${passwordFieldId}-error`} className={styles.errorMessage} role="alert" data-a11y-light-surface="true">{formData.errors.password}</p>}
-
-            <button
-            type="button"
-            className={styles.forgotPasswordButton}
-            onClick={handleForgotPassword}
-            >
-            Esqueceu a Senha?
-            </button>
 
             <button type="submit" className={styles.submitButton} disabled={isLoggingIn}>
             {isLoggingIn ? 'Entrando...' : 'Acessar Conta'}

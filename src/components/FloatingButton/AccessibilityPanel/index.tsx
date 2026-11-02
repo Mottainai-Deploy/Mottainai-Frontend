@@ -174,8 +174,10 @@ function AccessibilityPanel({ id, isOpen, preferences, onPreferenceChange, onRes
         </div>
         <ChoiceGroup id={`${id}-font`} legend="Tipo de fonte" value={preferences.font} options={[["default", "Padrão"], ["verdana", "Verdana"], ["arial", "Arial"], ["lexend", "Lexend"], ["andika", "Andika"], ["comic", "Comic Sans"], ["serif", "Com serifa"]]} onChange={(value) => choose("font", value)} />
         <p className={styles.hint}>Nenhuma fonte funciona igual para todo mundo: teste e escolha a mais confortável. Lexend e Andika dependem das fontes instaladas no dispositivo.</p>
-        <label className={styles.rangeLabel} htmlFor={`${id}-spacing`}>Espaçamento <output htmlFor={`${id}-spacing`}>{preferences.spacing.toFixed(1)}</output></label>
+        <label className={styles.rangeLabel} htmlFor={`${id}-spacing`}>Espaçamento entre letras e palavras <output htmlFor={`${id}-spacing`}>{preferences.spacing.toFixed(1)}</output></label>
         <input className={styles.range} id={`${id}-spacing`} type="range" min="0" max="2" step="0.1" value={preferences.spacing} onChange={(event) => onPreferenceChange("spacing", Number(event.currentTarget.value))} />
+        <label className={styles.rangeLabel} htmlFor={`${id}-line-spacing`}>Espaçamento vertical entre linhas <output htmlFor={`${id}-line-spacing`}>{preferences.lineSpacing.toFixed(1)}</output></label>
+        <input className={styles.range} id={`${id}-line-spacing`} type="range" min="0" max="2" step="0.1" value={preferences.lineSpacing} onChange={(event) => onPreferenceChange("lineSpacing", Number(event.currentTarget.value))} />
         <div className={styles.toggles}>
           <button type="button" aria-pressed={preferences.underline} onClick={() => onPreferenceChange("underline", !preferences.underline)}>
             Sublinhar links

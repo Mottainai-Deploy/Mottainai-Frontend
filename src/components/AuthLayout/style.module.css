@@ -64,16 +64,19 @@
     max-width: 400px;
 }
 
+.separatePassword {
+    /* Tamanho */
+    min-width: 0;
+}
+
+.separatePassword:not([hidden]) {
+    /* Layout */
+    display: grid;
+    gap: 1rem;
+}
+
 .visuallyHidden {
-    position: absolute;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    border: 0;
-    white-space: nowrap;
+    composes: visually-hidden from global;
 }
 
 .input {
@@ -144,7 +147,7 @@
     padding: 18px;
     margin-top: 0.75rem;
     background-color: var(--motta-blue);
-    color: #fff;
+    color: var(--main-white);
     font-size: 1.1rem;
     font-weight: 500;
     transition: background-color calc(0.2s * var(--a11y-motion-factor, 1)) ease-in-out;
@@ -165,24 +168,6 @@
     color: var(--a11y-brand-text, var(--motta-blue));
     font-weight: 700;
     text-decoration: underline;
-}
-
-.forgotPasswordButton {
-    align-self: flex-end;
-    margin-top: -4px;
-    border: 0;
-    background: transparent;
-    color: var(--a11y-brand-text, var(--motta-blue));
-    font: inherit;
-    font-size: 0.85rem;
-    font-weight: 700;
-    text-decoration: underline;
-    cursor: pointer;
-}
-
-.forgotPasswordButton:focus-visible {
-    outline: 2px solid var(--motta-light-blue);
-    outline-offset: 3px;
 }
 
 .backButton {
@@ -216,7 +201,7 @@
     border: 1px solid rgba(179, 38, 30, 0.2);
     border-radius: 0.5rem;
     background-color: #fff1f0;
-    color: #8f1d18;
+    color: var(--a11y-feedback-error-text);
     text-align: left;
 }
 
@@ -255,7 +240,7 @@
 
 :global(html[data-a11y-theme='dark']) .artworkCanvas {
     /* Aparência */
-    border-left: 4px solid #fff;
+    border-left: 4px solid var(--main-white);
 }
 
 .artworkCanvas {
@@ -311,7 +296,7 @@
     display: block;
 
     /* Texto */
-    color: #fff;
+    color: var(--main-white);
     font-family: Lexend, sans-serif;
     font-size: clamp(2.75rem, 9.167cqw, 4.125rem);
     font-weight: 700;
@@ -339,7 +324,7 @@
 
 .artworkJapanese {
     /* Texto */
-    color: #fff;
+    color: var(--main-white);
     font-family: 'Noto Sans JP', 'Yu Gothic', Meiryo, sans-serif;
     font-size: clamp(1.125rem, 3.75cqw, 1.6875rem);
     font-weight: 700;
@@ -359,7 +344,7 @@
     margin: 0;
 
     /* Texto */
-    color: #fff;
+    color: var(--main-white);
     font-family: Lexend, sans-serif;
     font-size: clamp(1.75rem, 5.28cqw, 2.375rem);
     font-weight: 700;
@@ -380,7 +365,7 @@
 
 .orangeWord {
     /* Texto */
-    color: #ff963d;
+    color: var(--motta-highlight-orange);
     font-weight: 700;
 }
 
@@ -522,7 +507,7 @@
 
 :global(html[data-a11y-theme="dark"]) .successMessage {
     /* Aparência */
-    background-color: #205c1c;
+    background-color: var(--a11y-status-success-surface);
     /* Texto */
-    color: #fff;
+    color: var(--main-white);
 }

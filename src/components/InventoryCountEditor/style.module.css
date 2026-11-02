@@ -1,0 +1,109 @@
+.page,
+.card,
+.fields {
+  /* Layout */
+  display: grid;
+  gap: 1rem;
+
+  /* Tamanho */
+  min-width: 0;
+}
+
+.card {
+  /* Tamanho */
+  padding: clamp(1rem, 3vw, 2rem);
+
+  /* Aparência */
+  background-color: var(--a11y-surface, var(--main-white));
+  border-radius: 0.75rem;
+  border: 1px solid var(--a11y-card-border, #aaa29a);
+
+  /* Texto */
+  color: var(--a11y-text-muted, #373431);
+}
+
+.fields {
+  /* Tamanho */
+  padding: 0;
+  margin: 0;
+
+  /* Aparência */
+  border: 0;
+}
+
+.page input,
+.page textarea,
+.page select {
+  /* Tamanho */
+  width: 100%;
+  min-width: 0;
+  min-height: 2.75rem;
+  padding: 0.65rem;
+
+  /* Aparência */
+  background-color: var(--a11y-surface, var(--main-white));
+  border-radius: 0.5rem;
+  border: 1px solid #aaa29a;
+
+  /* Texto */
+  font: inherit;
+  color: var(--a11y-text-muted, #373431);
+}
+
+.page button,
+.back {
+  /* Tamanho */
+  min-height: 2.75rem;
+  padding: 0.65rem 1rem;
+
+  /* Aparência */
+  background-color: var(--a11y-surface, var(--main-white));
+  border-radius: 0.5rem;
+  border: 1px solid currentColor;
+
+  /* Texto */
+  font: inherit;
+  font-weight: 700;
+  color: var(--a11y-brand-text, var(--motta-blue));
+  overflow-wrap: anywhere;
+}
+
+.page :is(button, a, input, select, textarea, h2, p):focus-visible {
+  /* Aparência */
+  outline: 3px solid var(--a11y-brand-text, var(--motta-blue));
+  outline-offset: 3px;
+}
+
+.actions {
+  /* Layout */
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.itemTable {
+  /* Tamanho */
+  min-width: 0;
+}
+
+.itemTable table {
+  /* Tamanho */
+  min-width: 56rem;
+}
+
+.error {
+  /* Texto */
+  color: var(--a11y-text-muted, var(--a11y-feedback-error-text));
+}
+
+.feedback {
+  /* Texto */
+  color: var(--a11y-text-muted, var(--a11y-status-success-text));
+}
+
+@media (max-width: 640px) {
+  .actions {
+    /* Layout */
+    flex-direction: column;
+  }
+}

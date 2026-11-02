@@ -207,7 +207,7 @@ html[data-a11y-theme="dark"] .modalBackdrop {
 
 html[data-a11y-theme="dark"] .modalHeading h2 {
     /* Texto */
-    color: #ff963d;
+    color: var(--motta-highlight-orange);
 }
 
 .closeButton {
@@ -254,8 +254,12 @@ html[data-a11y-theme="dark"] .modalHeading h2 {
 }
 
 .formError {
-    color: #a32720;
+    color: var(--a11y-field-error-text);
     font-size: .9rem;
+}
+
+:global(html[data-a11y-theme="dark"]) .formError {
+    color: var(--a11y-error-text);
 }
 
 .formActions {
@@ -266,14 +270,7 @@ html[data-a11y-theme="dark"] .modalHeading h2 {
 }
 
 .visuallyHidden {
-    position: absolute;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    border: 0;
-    white-space: nowrap;
+    composes: visually-hidden from global;
 }
 
 @media (max-width: 768px) {

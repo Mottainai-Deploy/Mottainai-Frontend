@@ -10,7 +10,7 @@
   padding: clamp(1rem, 4vw, 3rem);
 
   /* Aparência */
-  background-color: var(--main-white, #fff);
+  background-color: var(--main-white, var(--main-white));
 
   /* Texto */
   color: var(--a11y-brand-text, var(--motta-blue, #102a43));
@@ -65,14 +65,19 @@
   padding: 0.7rem 1rem;
 
   /* Aparência */
-  border-radius: 0.5rem;
   background-color: var(--motta-blue, #102a43);
+  border-radius: 0.5rem;
+  border: 0;
 
   /* Texto */
-  color: var(--main-white, #fff);
+  font: inherit;
   font-weight: 700;
+  color: var(--main-white, var(--main-white));
   text-decoration: underline;
   text-underline-offset: 0.15em;
+
+  /* Efeitos */
+  cursor: pointer;
 }
 
 .returnLink:focus-visible {

@@ -6,22 +6,18 @@
     --motta-orange: #a84b00;
     --motta-light-orange: rgba(221, 123, 45, 1);
     --main-gray: rgba(168, 164, 164, 1);
-    --main-white: #fff;
-    --main-white-rgb: 255, 255, 255;
     --a11y-surface: #fff;
     --a11y-surface-raised: #f5f7f9;
     --a11y-card-border: rgba(16, 42, 67, 0.12);
     --a11y-on-brand: var(--main-white);
     --a11y-text-muted: #625d58;
     --a11y-folder-navigation: var(--motta-blue);
-    --a11y-folder-tab: #f7f6f5;
-    --a11y-folder-tab-text: #625d58;
+    --a11y-folder-tab: #d1cbc4;
+    --a11y-folder-tab-text: #514b45;
     --a11y-folder-active: var(--a11y-surface);
     --a11y-folder-active-text: var(--motta-blue);
     --a11y-folder-border: transparent;
-    --a11y-action-surface: #ded8d0;
     --a11y-action-text: #373431;
-    --a11y-action-border: #ded8d0;
     --sidebar-width: 220px;
     --bottom-nav-height: 64px;
     --sidebar-transition: calc(0.3s * var(--a11y-motion-factor, 1)) ease;
@@ -120,6 +116,19 @@ button {
     max-width: 100%;
 }
 
+button:not(:disabled) {
+    /* Efeitos */
+    transition: all 0.3s ease-in-out;
+}
+
+html button:not(:disabled):hover {
+    /* Aparência */
+    background-image: linear-gradient(
+        var(--a11y-button-hover-overlay),
+        var(--a11y-button-hover-overlay)
+    );
+}
+
 @media (max-width: 480px) {
     *::-webkit-scrollbar {
         width: 0.55rem;
@@ -131,3 +140,23 @@ p, span, h1, h2, h3, h4, h5, h6, div, li, time, dt, dd, label, td, th, strong, e
     cursor: default;
 }
 
+/* Utility shared by labels and status text hidden only from sighted users. */
+.visually-hidden {
+    /* Layout */
+    position: absolute;
+    overflow: hidden;
+
+    /* Tamanho */
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+
+    /* Aparência */
+    border: 0;
+    clip: rect(0, 0, 0, 0);
+    clip-path: inset(50%);
+
+    /* Texto */
+    white-space: nowrap;
+}

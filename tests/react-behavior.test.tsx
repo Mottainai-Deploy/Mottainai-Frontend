@@ -1,27 +1,22 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { act, cleanup, render, renderHook, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, render, renderHook, screen } from '@testing-library/react';
+import { useEffect } from 'react';
+import type { ReactNode } from 'react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import * as authService from '@/services/authService';
-import * as historicalMetricService from '@/services/historicalMetricService';
 import { AuthProvider } from '@/context/AuthProvider';
 import { PrivateRoute } from '@/pages/PrivateRoute';
 import { useAuth } from '@/hooks/useAuth';
-import { useHistoricalMetrics } from '@/hooks/useHistoricalMetrics';
 import { useMinimumLoadingVisibility } from '@/hooks/useMinimumLoadingVisibility';
-import type { HistoricalMetric } from '@/types/historical-metric.types';
+import Loading from '@/components/Loading';
 
 vi.mock('@/services/authService', () => ({
-  isMockAuthenticationEnabled: true,
   login: vi.fn(),
-}));
-
-vi.mock('@/services/historicalMetricService', () => ({
-  getHistoricalMetrics: vi.fn(),
+  logout: vi.fn().mockResolvedValue(undefined),
 }));
 
 const TOKEN_KEY = '@App:token';
 const loginMock = vi.mocked(authService.login);
-const metricsMock = vi.mocked(historicalMetricService.getHistoricalMetrics);
 
 function encodeBase64Url(value: object): string {
   return btoa(JSON.stringify(value))
@@ -42,17 +37,28 @@ function createToken(exp = Math.floor(Date.now() / 1000) + 3600): string {
   return `${encodeBase64Url(header)}.${encodeBase64Url(payload)}.test-signature`;
 }
 
-function renderProtectedRoute() {
+function SessionLogin({ children }: { children: ReactNode }) {
+  const { login, isAuthenticated } = useAuth();
+  useEffect(() => {
+    void login({ email: 'test@example.com', password: 'password' });
+  }, [login]);
+  return isAuthenticated ? children : null;
+}
+
+function renderProtectedRoute(startSession = false) {
+  const router = (
+    <MemoryRouter initialEntries={['/private']}>
+      <Routes>
+        <Route path="/login" element={<p>Login público</p>} />
+        <Route element={<PrivateRoute />}>
+          <Route path="/private" element={<p>Conteúdo protegido</p>} />
+        </Route>
+      </Routes>
+    </MemoryRouter>
+  );
   return render(
     <AuthProvider>
-      <MemoryRouter initialEntries={['/private']}>
-        <Routes>
-          <Route path="/login" element={<p>Login público</p>} />
-          <Route element={<PrivateRoute />}>
-            <Route path="/private" element={<p>Conteúdo protegido</p>} />
-          </Route>
-        </Routes>
-      </MemoryRouter>
+      {startSession ? <SessionLogin>{router}</SessionLogin> : router}
     </AuthProvider>,
   );
 }
@@ -60,7 +66,6 @@ function renderProtectedRoute() {
 beforeEach(() => {
   localStorage.clear();
   loginMock.mockReset();
-  metricsMock.mockReset();
 });
 
 afterEach(() => {
@@ -68,71 +73,18 @@ afterEach(() => {
   localStorage.clear();
 });
 
-describe('R3 — useHistoricalMetrics', () => {
-  it('mostra carregamento e depois entrega os dados', async () => {
-    const metrics: HistoricalMetric[] = [{ date: '2026-10-01', value: 42 }];
-    metricsMock.mockResolvedValue(metrics);
-
-    const { result } = renderHook(() => useHistoricalMetrics());
-
-    expect(result.current.isLoading).toBe(true);
-    await waitFor(() => {
-      expect(result.current).toEqual({ data: metrics, isLoading: false, error: null });
-    });
-  });
-
-  it('expõe a falha de carregamento no estado do hook', async () => {
-    metricsMock.mockRejectedValue(new Error('Falha simulada'));
-
-    const { result } = renderHook(() => useHistoricalMetrics());
-
-    await waitFor(() => {
-      expect(result.current.isLoading).toBe(false);
-      expect(result.current.error).toBe('Falha simulada');
-    });
-  });
-
-  it('aborta a consulta quando o componente desmonta', () => {
-    let requestSignal: AbortSignal | undefined;
-    metricsMock.mockImplementation((signal) => {
-      requestSignal = signal;
-      return new Promise<HistoricalMetric[]>(() => undefined);
-    });
-
-    const { unmount } = renderHook(() => useHistoricalMetrics());
-
-    expect(requestSignal?.aborted).toBe(false);
-    unmount();
-    expect(requestSignal?.aborted).toBe(true);
-  });
+it('preserva o título da página de destino ao encerrar o carregamento', () => {
+  document.title = 'Sistema Mottainai';
+  const { unmount } = render(<Loading />);
+  expect(document.title).toBe('Carregando | Mottainai');
+  document.title = 'Página não encontrada | Mottainai';
+  unmount();
+  expect(document.title).toBe('Página não encontrada | Mottainai');
 });
 
-describe('R5 — sessão local versionada', () => {
-  it('migra token legado válido para o schema _versao 1', () => {
-    const token = createToken();
-    localStorage.setItem(TOKEN_KEY, JSON.stringify(token));
-
-    const { result } = renderHook(() => useAuth(), { wrapper: AuthProvider });
-
-    expect(result.current.isAuthenticated).toBe(true);
-    expect(result.current.user?.id).toBe('test-user-id');
-    expect(JSON.parse(localStorage.getItem(TOKEN_KEY) ?? 'null')).toEqual({ _versao: 1, token });
-  });
-
-  it('descarta schema desconhecido sem autenticar a pessoa', () => {
-    localStorage.setItem(TOKEN_KEY, JSON.stringify({ _versao: 2, token: createToken() }));
-
-    const { result } = renderHook(() => useAuth(), { wrapper: AuthProvider });
-
-    expect(result.current.isAuthenticated).toBe(false);
-    expect(localStorage.getItem(TOKEN_KEY)).toBeNull();
-  });
-
-  it('descarta token expirado do schema atual', () => {
-    localStorage.setItem(
-      TOKEN_KEY,
-      JSON.stringify({ _versao: 1, token: createToken(Math.floor(Date.now() / 1000) - 60) }),
-    );
+describe('R5 — sessão mantida em memória', () => {
+  it('descarta tokens locais antigos ao iniciar a aplicação', () => {
+    localStorage.setItem(TOKEN_KEY, JSON.stringify({ _versao: 1, token: createToken() }));
 
     const { result } = renderHook(() => useAuth(), { wrapper: AuthProvider });
 
@@ -175,8 +127,8 @@ describe('R9 — PrivateRoute', () => {
   });
 
   it('libera a rota quando há uma sessão válida no Context', async () => {
-    localStorage.setItem(TOKEN_KEY, JSON.stringify({ _versao: 1, token: createToken() }));
-    renderProtectedRoute();
+    loginMock.mockResolvedValue({ token: createToken() });
+    renderProtectedRoute(true);
 
     expect(await screen.findByText('Conteúdo protegido')).toBeTruthy();
     expect(screen.queryByText('Login público')).toBeNull();

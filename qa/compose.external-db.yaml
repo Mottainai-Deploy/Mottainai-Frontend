@@ -1,0 +1,18 @@
+services:
+  api:
+    environment:
+      DB_URL: ${DB_URL:?Defina DB_URL no arquivo de ambiente}
+      DB_USER: ${DB_USERNAME:?Defina DB_USERNAME no arquivo de ambiente}
+      DB_PASSWORD: ${DB_PASSWORD:?Defina DB_PASSWORD no arquivo de ambiente}
+      DB_SCHEMA: ${DB_SCHEMA:?Defina DB_SCHEMA no arquivo de ambiente}
+      # O ambiente local compartilha um banco remoto com limite de conexões.
+      SPRING_DATASOURCE_HIKARI_MAXIMUMPOOLSIZE: "1"
+      SPRING_DATASOURCE_HIKARI_MINIMUMIDLE: "0"
+      SPRING_DATASOURCE_HIKARI_MAXLIFETIME: "120000"
+      SPRING_DATASOURCE_HIKARI_KEEPALIVETIME: "30000"
+      SPRING_DATASOURCE_HIKARI_IDLETIMEOUT: "30000"
+      SPRING_DATASOURCE_HIKARI_CONNECTIONTIMEOUT: "15000"
+      SPRING_DATASOURCE_HIKARI_VALIDATIONTIMEOUT: "5000"
+      # Evita a descoberta inicial de dialeto; a validação do esquema segue ativa.
+      SPRING_APPLICATION_JSON: >-
+        {"spring":{"jpa":{"database-platform":"org.hibernate.dialect.PostgreSQLDialect","hibernate":{"ddl-auto":"validate"},"properties":{"hibernate.boot.allow_jdbc_metadata_access":false}}}}

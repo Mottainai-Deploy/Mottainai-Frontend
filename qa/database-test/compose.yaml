@@ -1,0 +1,44 @@
+name: mottainai-database-test
+
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: mottainai_seed_test
+      POSTGRES_USER: seed_admin
+      POSTGRES_PASSWORD: ${TEST_DB_PASSWORD:?Execute start.ps1 primeiro}
+      TZ: America/Sao_Paulo
+      PGTZ: America/Sao_Paulo
+    ports:
+      - "127.0.0.1:${TEST_DB_PORT:-15432}:5432"
+    volumes:
+      - database_test_data:/var/lib/postgresql/data
+      - ./schema:/schema:ro
+      - ./init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "psql -h 127.0.0.1 -U seed_admin -d mottainai_seed_test -tAc 'SELECT ready FROM qa_fixture.environment' | grep -qx t"]
+      interval: 3s
+      timeout: 5s
+      retries: 30
+      start_period: 10s
+
+  seed:
+    image: postgres:15
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGHOST: postgres
+      PGDATABASE: mottainai_seed_test
+      PGUSER: seed_admin
+      PGPASSWORD: ${TEST_DB_PASSWORD:?Execute start.ps1 primeiro}
+      PGTZ: America/Sao_Paulo
+    volumes:
+      - ./seed.sql:/fixture/seed.sql:ro
+      - ./verify.sql:/fixture/verify.sql:ro
+    entrypoint: ["sh", "-ec"]
+    command:
+      - psql -X -v ON_ERROR_STOP=1 -f /fixture/seed.sql && psql -X -v ON_ERROR_STOP=1 -f /fixture/verify.sql
+
+volumes:
+  database_test_data:

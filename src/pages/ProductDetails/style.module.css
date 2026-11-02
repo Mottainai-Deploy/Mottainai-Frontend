@@ -56,8 +56,8 @@
     display: inline-flex;
     padding: 0.25rem 0.75rem;
     border-radius: 999px;
-    background: #ffe7b0;
-    color: #8a5200;
+    background: var(--a11y-status-warning-surface);
+    color: var(--a11y-status-warning-text);
     font-weight: 700;
     white-space: nowrap;
 }
@@ -77,8 +77,12 @@
 }
 
 .feedback [role="alert"] {
-    color: #8f151b;
+    color: var(--a11y-status-critical-text);
     font-weight: 700;
+}
+
+:global(html[data-a11y-theme="dark"]) .feedback [role="alert"] {
+    color: var(--a11y-error-text);
 }
 
 @media (max-width: 680px) {

@@ -66,6 +66,14 @@ function renderArtworkSlogan(variant: AuthArtworkVariant): ReactNode {
           <span className={styles.artworkLine}>{highlightedText('novo código')}.</span>
         </>
       );
+    case 'unavailable':
+      return (
+        <>
+          <span className={styles.artworkLine}>Integração</span>
+          <span className={styles.artworkLine}>{highlightedText('indisponível')}</span>
+          <span className={styles.artworkLine}>no momento.</span>
+        </>
+      );
     default: {
       const exhaustiveCheck: never = variant;
       return exhaustiveCheck;
@@ -92,6 +100,8 @@ function renderArtworkIcons(variant: AuthArtworkVariant): ReactNode {
           <img className={`${styles.artworkIcon} ${styles.artworkIconInvalidCross}`} src={invalidLinkCrossArtworkIcon} alt="" />
         </>
       );
+    case 'unavailable':
+      return null;
     default: {
       const exhaustiveCheck: never = variant;
       return exhaustiveCheck;

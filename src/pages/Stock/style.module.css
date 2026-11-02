@@ -1,13 +1,19 @@
 .page {
+    /* Layout */
+    display: grid;
+    gap: clamp(1.25rem, 2.4vw, 1.75rem);
+
+    /* Tamanho */
     width: 100%;
     min-width: 0;
 }
 
 .toolbar {
+    /* Layout */
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    gap: 1rem;
+    align-items: center;
+    gap: 1rem 1.5rem;
 }
 
 .newCountButton {
@@ -40,7 +46,38 @@
 }
 
 .tableSection {
-    margin-top: clamp(1rem, 2vw, 1.5rem);
+    /* Layout */
+    display: grid;
+    gap: 1rem;
+
+    /* Tamanho */
+    min-width: 0;
+    margin: 0;
+}
+
+.queryErrors {
+    /* Layout */
+    display: grid;
+    gap: 0.65rem;
+    list-style: none;
+
+    /* Tamanho */
+    min-width: 0;
+    margin: 0;
+    padding: 1rem 1.25rem;
+
+    /* Aparência */
+    background-color: var(--a11y-surface-raised, #f5f7f9);
+    border-radius: 0.75rem;
+    border: 1px solid var(--a11y-field-error-border-strong);
+
+    /* Texto */
+    color: var(--a11y-text-muted, #373431);
+}
+
+.queryErrors li {
+    /* Texto */
+    line-height: 1.5;
 }
 
 .reportButton {
@@ -50,7 +87,7 @@
     min-height: 1.9rem;
     padding: 0.3rem 0.7rem;
     border-radius: 0.35rem;
-    background: #ded8d0;
+    background: var(--a11y-action-surface);
     color: var(--a11y-text-muted, #373431);
     font-size: 0.75rem;
     font-weight: 700;
@@ -59,22 +96,14 @@
 }
 
 .sr-only {
-    position: absolute;
-    top: 0;
-    left: 0;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    border: 0;
-    white-space: nowrap;
+    composes: visually-hidden from global;
 }
 
 @media (max-width: 768px) {
     .toolbar {
-        align-items: stretch;
+        /* Layout */
         flex-direction: column;
+        align-items: stretch;
     }
     .newCountButton {
         align-self: flex-end;
@@ -84,5 +113,60 @@
 @media (max-width: 640px) {
     .newCountButton {
         width: 100%;
+    }
+}
+.inventoryFilters {
+    /* Layout */
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 1.5rem;
+    row-gap: 1rem;
+
+    /* Tamanho */
+    min-width: 0;
+}
+
+.inventoryFilters label {
+    /* Layout */
+    display: grid;
+    gap: 0.4rem;
+
+    /* Tamanho */
+    min-width: 0;
+    max-width: 100%;
+
+    /* Texto */
+    color: var(--a11y-text-muted, #373431);
+}
+
+.inventoryFilters input,
+.inventoryFilters select {
+    /* Tamanho */
+    width: 100%;
+    min-width: 0;
+    min-height: 2.75rem;
+    padding: 0.6rem;
+
+    /* Aparência */
+    background-color: var(--a11y-surface, var(--main-white));
+    border-radius: 0.5rem;
+    border: 1px solid #aaa29a;
+
+    /* Texto */
+    font: inherit;
+    color: var(--a11y-text-muted, #373431);
+}
+
+.inventoryFilters :is(input, select):focus-visible {
+    /* Aparência */
+    outline: 3px solid var(--a11y-brand-text, var(--motta-blue));
+    outline-offset: 3px;
+}
+
+@media (max-width: 640px) {
+    .inventoryFilters {
+        /* Layout */
+        flex-direction: column;
+        gap: 1rem;
     }
 }

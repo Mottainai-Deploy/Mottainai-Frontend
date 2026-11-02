@@ -4,7 +4,7 @@
 
 **Painel web administrativo do Mottainai: gestão preditiva de estoque para pequenos e médios varejos**
 
-*SPA em React + TypeScript + Vite com telas de visão geral, alertas de vencimento, produtos, estoque, relatórios, contabilidade e usuários. Tem um widget de acessibilidade bem completo, mas hoje roda só com dados de demonstração.*
+*SPA em React + TypeScript + Vite. Catálogo, estoque e operações disponíveis consultam a API configurada; telas sem endpoint não exibem dados de demonstração.*
 
 <br/>
 
@@ -43,15 +43,15 @@ Este repositório guarda o **frontend web administrativo** (`sistema-mottainai` 
 
 | Domínio | O que a interface oferece |
 |---|---|
-| **Inteligência / Motor** | Visão geral com "decisões do motor" nas últimas 24h, assertividade do motor e alertas de vencimento com ação sugerida |
-| **Produtos** | Listagem, detalhe com histórico e cadastro (individual ou importação de arquivo XML/CSV) |
-| **Estoque** | Inventário/contagem, avarias e consumo interno, transferências entre lojas, fornecedores e divergência de fechamento de caixa |
-| **Relatórios e contabilidade** | Relatório gerencial de mais vendidos e relatório financeiro mensal (rotulado como SPED), ambos exportados em CSV |
-| **Usuários** | Funcionários (papéis Gerente, Estoquista e Caixa) e log de auditoria |
+| **Inteligência / Motor** | Validades registradas em lotes da API; indicadores e decisões do motor ficam indisponíveis sem endpoint correspondente |
+| **Produtos** | Listagem, detalhe cadastral e cadastro manual pela API; importação XML/CSV não está integrada |
+| **Estoque** | Inventário, contagens, baixas, consumo interno, transferências e fornecedores consultados pela API; conciliação de caixa indisponível |
+| **Relatórios e contabilidade** | Indisponíveis até a API fornecer dados de vendas, financeiros e fiscais |
+| **Usuários** | Funcionários, cargos, lojas e auditoria consultados pela API |
 | **Acessibilidade** | Botão flutuante com tema, contraste, fonte, espaçamento, filtros de visão de cores, leitura em voz alta e outros ajustes |
 
 > [!IMPORTANT]
-> Hoje a aplicação é um **protótipo navegável**. Não há nenhuma chamada HTTP no código-fonte. Todos os dados vêm de arquivos locais (`src/data/`), de arrays escritos direto nos componentes ou de serviços que simulam latência com `setTimeout`. Detalhes na [seção 7](#7-dados-integrações-e-autenticação).
+> A aplicação consulta os recursos configurados em `VITE_API_BASE_URL` e não usa dados de demonstração como alternativa. Quando um recurso ainda não tem endpoint, a tela informa essa limitação. Configure as variáveis de ambiente antes de autenticar ou carregar dados.
 
 ---
 
@@ -65,23 +65,18 @@ flowchart TB
         MAIN["main.tsx<br/>StrictMode"] --> AP["AuthProvider<br/>(useReducer + Context)"]
         AP --> R["routes/index.tsx<br/>BrowserRouter + lazy()"]
         R --> FB["FloatingButton<br/>widget de acessibilidade"]
-        R --> PUB["Rotas públicas<br/>login · recuperação de senha"]
+        R --> PUB["Rotas públicas<br/>login · ativação por convite"]
         R --> PR["PrivateRoute"] --> ML["MainLayout<br/>Header + Sidebar"] --> PAGES["Páginas privadas"]
 
-        PAGES --> DATA["src/data/*.ts<br/>arrays estáticos"]
-        PAGES --> SVC["src/services/*.ts<br/>mocks com setTimeout"]
+        PAGES --> SVC["src/services/*.ts<br/>requisições à API"]
+        SVC --> API["apiClient.ts<br/>VITE_API_BASE_URL"]
+        API --> BACKEND["API operacional"]
         PAGES --> UTIL["src/utils/*<br/>validação, CSV"]
 
-        SVC --> LS[("localStorage<br/>token, preferências")]
-        SVC --> IDB[("IndexedDB<br/>relatórios")]
+        SVC --> SESSION["Sessão em memória"]
         FB --> SPEECH["Web Speech API"]
-        FB --> LS
+        FB --> LS["localStorage<br/>preferências de acessibilidade"]
     end
-
-    API["APIs Mottainai<br/>(não integradas)"]
-
-    classDef pending fill:#eee,stroke:#999,stroke-dasharray: 5 5,color:#555
-    class API pending
 ```
 
 ### Decisões observadas no código
@@ -92,8 +87,8 @@ flowchart TB
 | Estado de auth com `useReducer` + Context | `src/context/AuthProvider.tsx` | Sem biblioteca de estado global. O resto é estado local de página (`useState`, `use-immer`) |
 | Alias `@/` → `src/` | `vite.config.ts`, `tsconfig.app.json` | |
 | CSS Modules por componente | `*/style.module.css` | Estilos globais em `src/styles/global.css` e `src/styles/accessibility.css` |
-| Serviços assíncronos com `AbortSignal` | `historicalMetricService`, `rankingService` e hooks | Prontos para trocar o mock por `fetch` sem mexer nos hooks (inferência) |
-| Persistência só no cliente | `managementReportService`, `monthlyFinancialReportService` | IndexedDB com retenção de 365 dias |
+| Consultas e alterações à API | `src/services/*Service.ts` | Chamadas passam por `apiClient.ts`; listas cancelam consultas ao sair da tela |
+| Sessão | `src/services/apiClient.ts`, `src/context/AuthProvider.tsx` | Tokens ficam em memória e a API renova a sessão quando necessário |
 
 ---
 
@@ -142,11 +137,10 @@ Mottainai-Frontend/
 │   ├── components/            # ~25 componentes (MainLayout, Sidebar, Header, ReusableTable, charts, modais, filtros...)
 │   ├── config/                # folder-navigation.ts: abas de navegação por domínio
 │   ├── context/               # AuthContext + AuthProvider
-│   ├── data/                  # Dados de demonstração (produtos, estoque, contagens, transferências, fornecedores...)
-│   ├── hooks/                 # useAuth, useHistoricalMetrics, useRanking
+│   ├── hooks/                 # useAuth, useApiQuery e hooks de operações da API
 │   ├── pages/                 # Uma pasta por tela (index.tsx + style.module.css)
 │   ├── routes/index.tsx       # Definição das rotas
-│   ├── services/              # Auth, mocks de métricas/ranking/produtos, IndexedDB, Web Speech
+│   ├── services/              # Autenticação, catálogo, estoque, operações, usuários e auditoria
 │   ├── styles/                # global.css, accessibility.css
 │   ├── types/                 # Tipos por domínio (*.types.ts)
 │   ├── utils/                 # Validação de formulários, geração de CSV, contraste WCAG
@@ -166,7 +160,7 @@ Mottainai-Frontend/
 ```
 
 > [!NOTE]
-> Não há `.env.example`, `LICENSE`, `AGENTS.md` nem diretório `scripts/` versionados na `main`.
+> `.env.example` documenta as variáveis públicas necessárias. Crie `.env.local` para o ambiente local e não inclua chaves privadas ou segredos do servidor.
 
 ---
 
@@ -179,24 +173,20 @@ Definidas em `src/routes/index.tsx`. Rotas desconhecidas caem em `ErrorPage`.
 ```mermaid
 flowchart LR
     L["/ e /login"] -->|login| O["/overview"]
-    L --> PRC["/passwordRecovery"] --> NP["/newPassword"]
+    ACT["/activate-access"] --> L
 
     subgraph INT["Inteligência"]
-        O --- EX["/expiringProducts"] --- UH["/usageHistory"]
+        O --- EX["/expiringProducts"]
     end
     subgraph EST["Estoque"]
         S["/stock"] --- SD["/stock/damages"] --- ST["/stock/transfers"] --- SS["/stock/suppliers"]
         S --> SC["/stock/counts/new"]
-        S --> CC["/stock/cash-closing/:discrepancyId"]
         ST --> STN["/stock/transfers/new"]
         SS --> SSN["/stock/suppliers/new"]
     end
     subgraph PROD["Produtos"]
         P["/products"] --> PD["/products/:productId"]
         PRG["/productsRegistration"]
-    end
-    subgraph CONT["Relatórios"]
-        MR["/managementReports"] --- SP["/accounting/sped"]
     end
     subgraph USR["Usuários"]
         U["/users"] --- UN["/users/new"] --- UA["/users/audit"]
@@ -209,22 +199,19 @@ flowchart LR
 
 | Rota | Tela | Origem dos dados | Persistência das ações |
 |---|---|---|---|
-| `/`, `/login` | Login | `authService` (mock só em dev) | Token em `localStorage` |
-| `/passwordRecovery`, `/newPassword` | Recuperação de senha | `passwordRecoveryService` (mock com código fixo e latência simulada) | Memória |
-| `/overview` | Visão geral / decisões do motor | Array `decisionData` inline + cards com valores fixos | Nenhuma (modal só de leitura) |
-| `/home` | Dashboard com donut e histórico | `src/data/products.ts`, `wastedItemsByCategory.ts`, `useHistoricalMetrics`, `useRanking` (mocks) | Nenhuma |
-| `/expiringProducts` | Alertas de vencimento | Array inline + `EngineActionModal` ("Ação do Motor Mottainai") | Nenhuma |
-| `/usageHistory` | Hábitos de consumo | Dados inline + `HistoricalChart` | Nenhuma |
-| `/products`, `/products/:productId` | Produtos e detalhe | `src/data/products.ts` + `productDetailsService` (mock) | Nenhuma |
-| `/productsRegistration` | Cadastro e importação XML/CSV | `productImportService` (prévia gerada localmente, latência simulada) | Nenhuma (simulada) |
-| `/stock` e subrotas | Contagem, avarias, transferências, fornecedores, fechamento de caixa | `src/data/stock*.ts`, `suppliers.ts`, `stock-counts.ts`, `stock-transfers.ts` | Estado local da página |
-| `/managementReports` | Relatórios gerenciais (mais vendidos) | `src/data/stock.ts` | IndexedDB `mottainai-management-reports` + download CSV |
-| `/accounting/sped` | Relatório financeiro mensal | `src/data/stock.ts` | IndexedDB `mottainai-monthly-financial-reports` + download CSV |
-| `/users/*` | Funcionários e log de auditoria | Estado local | Estado local |
+| `/`, `/login` | Login | Firebase e API via `authService` | Sessão em memória |
+| `/activate-access` | Ativação de acesso por convite | Firebase e `/auth/password-reset` | Define a senha operacional e ativa o acesso |
+| `/overview` | Alertas e ações sugeridas da loja | `/alerts?storeId`, `/alerts/{id}`, `/alerts/{id}/suggested-actions` | Status e decisões registrados pela API; aprovar não executa a ação sugerida |
+| `/home` | Visão geral do estoque | `/products`, `/inventory`, `/batches` | Consulta à API |
+| `/expiringProducts` | Validades registradas | `/inventory`, `/batches`, `/products` | Consulta à API; sem classificação de risco inventada |
+| `/products`, `/products/:productId` | Catálogo e detalhe cadastral | `/products` | Consulta à API |
+| `/productsRegistration` | Cadastro manual de produto | `/products`, `/product-categories`, `/tax-profiles` | Criação pela API; importação não integrada |
+| `/stock` e subrotas | Estoque, contagens, baixas, transferências e fornecedores | Recursos `/inventory`, `/inventory-counts`, `/disposals`, `/inventory-movements`, `/transfers`, `/suppliers` e `/addresses` | Alterações persistidas pela API |
+| `/users/*` | Funcionários e auditoria | `/employees-store`, `/employees-company`, `/employee-roles`, `/stores`, `/audit-logs` | Alterações persistidas pela API |
 | `/account` | Conta do usuário logado | `useAuth` | Nenhuma |
 
-> [!WARNING]
-> A tela `/accounting/sped` gera um **CSV** de relatório financeiro mensal. Ela **não** gera um arquivo SPED (EFD) no layout oficial. "SPED" aparece só como rótulo e tooltip explicativo.
+> [!NOTE]
+> As telas de histórico comercial, relatórios gerenciais, SPED e conciliação de caixa foram removidas junto com suas rotas e acessos, pois não há contratos correspondentes na API operacional conectada.
 
 ### Widget de acessibilidade
 
@@ -253,13 +240,13 @@ O `FloatingButton` aparece em todas as rotas e guarda as preferências em `local
 
 ### Backends consumidos
 
-**Nenhum.** Verificações feitas no código da `main`:
+O frontend usa `VITE_API_BASE_URL`, definido em `.env.example`, como base das chamadas feitas por `src/services/apiClient.ts`. Os serviços integrados incluem autenticação/perfil, produtos e categorias, lotes, estoque, contagens, descartes, movimentações, transferências, fornecedores, endereços, lojas, funcionários, cargos, auditoria, alertas e ações sugeridas.
 
-- não há `fetch`, `axios` nem URL de API em `src/`. Inclusive, `tests/project-accessibility.test.mjs` **proíbe** chamadas `fetch` diretas em `src/`;
-- não há variáveis `VITE_*` nem `.env.example`. A única leitura de `import.meta.env` está em `src/services/authService.ts` (`DEV` e `MODE`);
-- o README do repositório confirma que o contrato e o endereço da API de autenticação **não estão definidos**.
+O login obtém um token Firebase com `VITE_FIREBASE_AUTH_URL` e `VITE_FIREBASE_API_KEY`, depois autentica na API operacional. A URL e a chave web devem corresponder ao ambiente configurado. Não há fallback de credenciais ou de dados de demonstração.
 
-Quais APIs do ecossistema (por exemplo Mottainai-Api-SQL-Operacional ou a camada de IA) este frontend vai consumir **não está confirmado no repositório**.
+Novas previsões do motor, vendas/histórico comercial, importação XML/CSV, conciliação de caixa e relatórios financeiros/fiscais continuam sem contrato integrado. A tela de visão geral lista apenas alertas e sugestões já registrados no servidor; não gera previsões locais. As telas sem contratos foram removidas da navegação e das rotas; o cadastro de produtos oferece somente o formulário manual.
+
+O fluxo público de recuperação de senha foi removido, incluindo suas páginas e rotas. A ativação por convite e a troca autenticada da senha operacional em Minha conta continuam disponíveis.
 
 ### Fluxo de autenticação atual
 
@@ -270,45 +257,42 @@ sequenceDiagram
     participant L as Login
     participant AP as AuthProvider
     participant AS as authService
-    participant M as mockAuthService
-    participant LS as localStorage
+    participant FB as Firebase Auth
+    participant API as API operacional
 
     U->>L: e-mail + senha
     L->>AP: login(credentials)
     AP->>AP: validateLoginCredentials + sanitize
     AP->>AS: login()
-    alt import.meta.env.DEV ou MODE == "lighthouse"
-        AS->>M: loginWithMockCredentials()
-        M-->>AS: JWT fake (assinatura "mock-signature", exp 1h)
-        AS-->>AP: { token }
-        AP->>AP: jwtDecode (sem verificar assinatura)
-        AP->>LS: "@App:token" = { _versao: 1, token }
-        AP-->>L: autenticado, PrivateRoute libera
-    else build de produção
-        AS-->>AP: Error "A autenticação real não está configurada"
-        AP-->>L: exibe erro
-    end
+    AS->>FB: e-mail e senha
+    FB-->>AS: token Firebase
+    AS->>API: POST /auth/firebase (token Firebase)
+    API-->>AS: access/refresh tokens
+    AS->>API: GET /auth/profile
+    API-->>AS: perfil
+    AS-->>AP: sessão e perfil
+    AP-->>L: autenticado, PrivateRoute libera
 ```
 
 | Comportamento | Detalhe |
 |---|---|
-| Mock só em dev/Lighthouse | Em `npm run dev` **qualquer** e-mail e senha não vazios entram |
-| Build de produção | Login sempre falha e sessões antigas em `localStorage` são descartadas na carga |
-| Sessão | Chave `@App:token`, schema versionado `_versao: 1`, com migração de token legado e descarte de token expirado |
-| Autorização | `PrivateRoute` só confere `isAuthenticated`. **Não há papéis/permissões** no frontend. Os papéis Gerente/Estoquista/Caixa existem só como dado do cadastro de funcionários |
+| Credenciais | E-mail e senha validados no Firebase; API operacional recebe somente o token em /auth/firebase e confirma o vínculo ativo |
+| Ambiente sem configuração | Login apresenta erro de configuração/integração e não cria uma sessão fictícia |
+| Sessão | Access/refresh tokens mantidos em memória; recarregar a página exige novo login |
+| Autorização | `PrivateRoute` só confere `isAuthenticated`; a API deve validar permissões. Os cargos e lojas exibidos na administração de funcionários vêm da API |
 
 > [!CAUTION]
-> Hoje o build de produção (o mesmo usado pela imagem Docker de QA) **não deixa acessar nenhuma rota privada**. Para navegar pelas telas, use `npm run dev`.
+> O build de produção e a imagem de QA precisam das variáveis Firebase/API e de uma conta operacional válida. Sem essa configuração, o login falha e as rotas privadas continuam protegidas.
 
 ### Armazenamento no navegador
 
 | Mecanismo | Chave / banco | Conteúdo |
 |---|---|---|
-| `localStorage` | `@App:token` | Token da sessão (mock) |
 | `localStorage` | `acessibility_v1` | Preferências de acessibilidade |
-| `localStorage` | `relatorios_gerenciais_v1` (migra de `mottainai.management-reports.preferences`) | Preferências de formato de relatório |
-| IndexedDB | `mottainai-management-reports` | Relatórios gerenciais (retenção de 365 dias) |
-| IndexedDB | `mottainai-monthly-financial-reports` | Relatórios financeiros mensais (retenção de 365 dias) |
+
+Na primeira inicialização após esta atualização, o frontend remove os bancos
+IndexedDB antigos que guardavam relatórios gerados a partir das amostras locais.
+Essa limpeza não afeta dados retornados pela API.
 
 ---
 
@@ -323,8 +307,8 @@ sequenceDiagram
 
 ```bash
 npm ci              # instala exatamente o que está no package-lock.json
-npm run dev         # Vite dev server, com login mock habilitado
-npm run build       # tsc -b && vite build (produção, login desabilitado)
+npm run dev         # Vite dev server (requer API/Firebase configurados para autenticar)
+npm run build       # tsc -b && vite build
 npm run preview     # serve o build com vite preview
 npm run lint        # ESLint
 npm run lint:html   # ESLint com relatório em relatorio-qualidade.html
@@ -339,13 +323,13 @@ npm run test:react  # só os testes Vitest
 <br/>
 
 ```bash
-npm run build:lighthouse   # build em --mode lighthouse (mock de login habilitado)
+npm run build:lighthouse   # build em --mode lighthouse, sem autenticação simulada
 npm run serve:lhci         # vite preview em 127.0.0.1:4174
 npm run lighthouse:ci      # build:lighthouse + node scripts/lighthouse-ci.cjs
 ```
 
 > [!WARNING]
-> `lighthouse:ci` chama `scripts/lighthouse-ci.cjs`, e o README cita `scripts/lighthouse-routes.cjs`. Os dois arquivos **não estão versionados**: o `.gitignore` ignora `/scripts/lighthouse-*.cjs`. Num clone limpo da `main` esse script **falha**. A variável `LIGHTHOUSE_AUTH_TOKEN`, citada no README, também depende desses scripts locais. O build `lighthouse` habilita o login mock e **não deve ser publicado**.
+> `lighthouse:ci` depende dos scripts de auditoria descritos nesta seção. O modo `lighthouse` não habilita login simulado; para navegar por rotas privadas, configure as mesmas credenciais e serviços usados no ambiente normal.
 
 </details>
 
@@ -353,9 +337,11 @@ npm run lighthouse:ci      # build:lighthouse + node scripts/lighthouse-ci.cjs
 
 | Variável | Uso | Fonte |
 |---|---|---|
-| `LIGHTHOUSE_AUTH_TOKEN` | Token de sessão de teste para a auditoria Lighthouse (opcional) | Só o README. O script que a lê não está no repositório |
+| `VITE_API_BASE_URL` | Endereço base da API operacional | `.env.example` |
+| `VITE_FIREBASE_AUTH_URL` | Endpoint de autenticação Firebase | `.env.example` |
+| `VITE_FIREBASE_API_KEY` | Chave pública do projeto Firebase | `.env.example` |
 
-Nenhuma variável `VITE_*` é usada pela aplicação.
+Variáveis `VITE_*` são incorporadas ao bundle e ficam visíveis no navegador; não use nelas segredos do servidor.
 
 ---
 
@@ -365,12 +351,12 @@ Nenhuma variável `VITE_*` é usada pela aplicação.
 
 | Arquivo | Runner | Cobertura |
 |---|---|---|
-| `tests/form-validation.test.mjs` | `node:test` | Validação e sanitização de funcionário, login, produto, ajuste e contagem de estoque, relatórios, fornecedor, transferência e recuperação de senha |
+| `tests/form-validation.test.mjs` | `node:test` | Validação e sanitização de funcionário, login, ajuste e contagem de estoque, fornecedor, transferência e formulários de senha |
 | `tests/project-accessibility.test.mjs` | `node:test` | Checagens estáticas: sem `.js` em `src/`, sem `any`, sem HTML inseguro, sem `fetch` direto, sem mutação de `useState`, inputs com `label`, imagens com `alt`, sem `div` clicável, contraste WCAG AA, `lang`, skip links e landmarks |
-| `tests/react-behavior.test.tsx` | Vitest + jsdom + Testing Library | Hooks `useHistoricalMetrics`/`useRanking` (loading, erro, abort), sessão versionada (migração, schema desconhecido, token expirado) e `PrivateRoute` |
+| `tests/react-behavior.test.tsx` | Vitest + jsdom + Testing Library | Sessão em memória, validação de login, `PrivateRoute` e tempo mínimo de carregamento |
 
 > [!NOTE]
-> Não há relatório nem limite de cobertura configurado, e não há testes E2E. Os testes não foram executados nesta análise.
+> Não há relatório nem limite de cobertura configurado, e não há testes E2E.
 
 ### Lint
 
@@ -410,7 +396,7 @@ docker run --rm -p 127.0.0.1:18081:8080 mottainai-frontend:qa
 <sub>Comandos tirados de `qa/README.md`. O workflow `qa-container.yml` só faz o build da imagem e não publica em registry.</sub>
 
 > [!WARNING]
-> **Divergência entre doc e código:** o `qa/README.md` diz que `authService.ts` "usa uma conta mock hardcoded e um JWT fake". Na `main` atual, o mock fica em `mockAuthService.ts` e é carregado **só** em dev/Lighthouse. Como a imagem usa `npm run build` (modo produção), o login na imagem de QA **sempre falha** e só as telas públicas ficam acessíveis. O aviso do QA README continua válido: não expor essa imagem publicamente.
+> A imagem de QA não injeta credenciais Firebase nem endereço da API por padrão. Sem essa configuração, as rotas privadas não abrem; o frontend não usa uma conta de demonstração.
 
 Não há deploy automatizado (Firebase, Vercel, S3 ou similar) configurado no repositório.
 
@@ -420,11 +406,10 @@ Não há deploy automatizado (Firebase, Vercel, S3 ou similar) configurado no re
 
 | # | Risco / limitação | Impacto | Recomendação |
 |:---:|---|---|---|
-| 1 | **Nenhuma integração com backend.** Todos os dados são mock e as ações não persistem fora do navegador | Funcionalidades do motor preditivo, estoque e usuários são só visuais | Definir o contrato com as APIs (OpenAPI) e uma camada de cliente HTTP única com base URL via `VITE_*` |
-| 2 | **Token em `localStorage`** e JWT decodificado **sem verificar assinatura** | Exposto a XSS. Qualquer token forjado com `exp` válido passaria pelo `PrivateRoute` se o mock vazasse para produção | Seguir o plano do README: sessão em cookie `HttpOnly` emitida pelo servidor. O frontend não deve tomar decisão de autorização |
+| 1 | **Cobertura parcial de API.** Recursos operacionais de catálogo/estoque/usuários estão integrados, mas motor, vendas, caixa e relatórios financeiros/fiscais não têm endpoints ligados | Essas telas informam a indisponibilidade e não exibem amostras | Definir e integrar os contratos correspondentes antes de reativar esses recursos |
+| 2 | **Token de sessão em memória no navegador** | A autorização precisa continuar sendo validada pela API em cada operação; `PrivateRoute` só controla navegação visual | Manter validação de sessão e permissões no servidor; avaliar cookie `HttpOnly` quando o backend oferecer esse fluxo |
 | 3 | **Sem controle de acesso por papel** no frontend | Qualquer usuário autenticado vê todas as telas (usuários, contabilidade) | Modelar papéis no token/sessão e proteger rotas por papel, além do backend |
 | 4 | **`lighthouse:ci` quebrado em clone limpo** (scripts ignorados no Git) | Auditoria documentada não é reproduzível | Versionar os scripts ou remover os comandos do `package.json`/README |
-| 5 | **Mock com valores fixos no código**: `passwordRecoveryService.ts` tem um código de verificação fixo (valor não reproduzido aqui) e o mock de login aceita qualquer credencial | Baixo enquanto ficar restrito a dev. Risco se o *tree-shaking*/condição de modo mudar | Manter o mock atrás de `import.meta.env.DEV` (como já é no login) e aplicar o mesmo à recuperação de senha. Hoje ela não tem esse guard |
 | 6 | **Dependências com faixas `^`/`~`** no `package.json` | Builds fora do `npm ci` podem resolver versões diferentes | Fixar versões exatas. O lockfile mitiga só quando se usa `npm ci` |
 
 <details>
@@ -435,8 +420,7 @@ Não há deploy automatizado (Firebase, Vercel, S3 ou similar) configurado no re
 - `agents2.md` (1.249 linhas, um prompt de "orquestrador de relatórios executivos") está **versionado**, apesar de constar no `.gitignore`. Não tem relação com o frontend.
 - A CI escuta `main` **e** `master`, mas só existe `main`.
 - Não há `LICENSE` no repositório.
-- Os relatórios CSV escapam células (`escapeCsvCell`) e usam BOM UTF-8 e separador `;`, o que é compatível com Excel pt-BR. O `escapeCsvCell` de `managementReports.ts` só duplica aspas. Ele **não neutraliza** células que começam com `=`, `+`, `-` ou `@` (*CSV/formula injection*). Hoje o risco é baixo porque os dados são mock, mas passa a ser relevante quando nomes de produto vierem de importação ou de API.
-- Os relatórios ficam no IndexedDB do navegador de cada usuário: não são compartilhados entre dispositivos e somem se o usuário limpar os dados do site.
+- Não há exportação de relatórios enquanto as integrações de vendas e finanças não estiverem disponíveis.
 
 </details>
 
@@ -464,7 +448,7 @@ Não há deploy automatizado (Firebase, Vercel, S3 ou similar) configurado no re
 - **Data da análise:** 2026-10-27
 - **Método:** leitura estática de um clone local (shallow, depth 50). Nenhum comando de install, build, teste ou deploy foi executado.
 - **Arquivos consultados:** `README.md`, `package.json`, `package-lock.json`, `vite.config.ts`, `vitest.config.ts`, `tsconfig.json`, `tsconfig.app.json`, `tsconfig.node.json`, `eslint.config.js`, `Dockerfile`, `.dockerignore`, `.gitignore`, `index.html`, `public/robots.txt`, `qa/README.md`, `qa/nginx.conf`, `.github/workflows/ci.yml`, `.github/workflows/qa-container.yml`, `agents2.md` (início), `.codex/reorder-css.mjs` (início), `src/main.tsx`, `src/routes/index.tsx`, `src/context/*`, `src/hooks/*`, `src/services/*`, `src/config/folder-navigation.ts`, `src/types/accessibility.types.ts`, `src/utils/managementReports.ts`, `src/utils/monthlyFinancialReports.ts`, `src/utils/accessibilityPreferences.ts`, `src/components/EngineActionModal/index.tsx`, imports e trechos de `src/pages/*/index.tsx` e `tests/*`.
-- **Fato x inferência:** as versões vêm do lockfile. O "motor" e as decisões de IA nas telas são dados fixos. A integração futura com APIs específicas do ecossistema **não está confirmada no repositório**.
+- **Fato x inferência:** as versões vêm do lockfile. Os módulos sem contrato integrado não exibem dados fixos como se fossem registros reais.
 
 </details>
 
@@ -475,3 +459,247 @@ Não há deploy automatizado (Firebase, Vercel, S3 ou similar) configurado no re
 <sub>Parte do ecossistema <a href="https://github.com/Mottainai-One">Mottainai-One</a></sub>
 
 </div>
+## Integração com a API operacional
+
+Copie `.env.example` para `.env.local` e configure `VITE_API_BASE_URL`,
+`VITE_FIREBASE_AUTH_URL` e `VITE_FIREBASE_API_KEY`. Reinicie o Vite após mudar
+as variáveis. Todas as variáveis `VITE_` ficam públicas no navegador: não coloque
+senhas do banco, segredos JWT ou chaves AES nelas.
+
+O ambiente local da API usa `http://localhost:18080/api/v1`. O projeto Firebase
+da chave web precisa corresponder ao `FIREBASE_PROJECT_ID` configurado no
+container. O identificador provisório do ambiente de QA precisa ser substituído
+antes de autenticar. A conta Firebase deve estar vinculada a um funcionário
+ativo no banco operacional, com loja e cargo válidos.
+
+O login usa a mesma senha digitada para Firebase e para a API, conforme a
+suposição adotada nesta integração. A API retorna access/refresh tokens;
+ambos ficam apenas em memória. Recarregar a página exige novo login.
+Requisições autenticadas renovam a sessão uma vez quando recebem HTTP 401;
+falha na renovação encerra a sessão local. O logout solicita revogação no servidor.
+O modo Lighthouse também usa a autenticação real e não habilita credenciais
+simuladas.
+
+Primeiro incremento conectado: autenticação, consulta paginada de fornecedores,
+cadastro com endereço consultado da API e edição de apelido/status. As listas
+tratam carregamento, sucesso, vazio e erro, com cancelamento ao sair da tela.
+Os endereços devem existir na API antes do cadastro de fornecedor. O contrato
+cria um endereço a partir dos campos enviados; selecionar um endereço existente
+no formulário fornece esses campos, sem presumir vínculo pelo ID.
+
+Produtos vinculados não fazem parte da resposta da listagem de fornecedores:
+a coluna de SKUs simulados foi removida até existir consulta dos vínculos.
+Funcionários, estoque, transferências e baixas têm integrações próprias; telas
+de indicadores, vendas e relatórios sem endpoint permanecem indisponíveis.
+
+Segundo incremento: listagem e detalhes cadastrais de produtos consultam
+`/products`; o cadastro manual envia o contrato real com categoria, perfil
+fiscal, código de barras, NCM, CEST opcional, nome, marca, unidade, descrição
+e peso opcional. Categorias e perfis fiscais ativos são consultados da API.
+O SKU é gerado pelo servidor. A consulta de produtos percorre as páginas
+retornadas pela API antes de aplicar os filtros locais existentes.
+
+A antiga importação XML/CSV e sua massa de produtos recentes não são mais
+expostas na página de cadastro: o backend fornecido não define esse contrato.
+Estoque, preço por loja, fornecedores e previsões não pertencem ao DTO de
+produto; as telas de catálogo mostram apenas dados cadastrais até a integração
+dos recursos correspondentes. O fluxo completo de cadastro depende da mesma
+conta Firebase/operacional requerida para fornecedores.
+
+Terceiro incremento: `/stock` consulta o estoque da loja vinculada ao usuário,
+combinando `/inventory`, `/batches` e `/products`. Exibe saldo por lote, tipo e
+local, validade e limites mínimo/máximo; pesquisa e filtros são locais sobre os
+dados carregados. A mesma página consulta `/inventory-counts` e permite abrir
+uma contagem existente pelo endereço `/stock/counts/new?id=ID`.
+
+Contagens são criadas explicitamente pelo usuário. O backend determina a loja
+e o funcionário a partir da sessão. Cada quantidade física é salva pelo ID do
+item de estoque: um item novo usa POST e um já contado usa PUT. Valores zero
+e quantidades com até três casas decimais são aceitos. O saldo do sistema
+mostrado na contagem é o snapshot retornado pelo servidor na inclusão do item.
+
+A finalização exige revisar os itens e confirmar a aplicação dos ajustes.
+A mesma chave `Idempotency-Key` é preservada nas tentativas de finalização da
+contagem enquanto o editor permanece aberto. Se a confirmação falhar, a tela
+bloqueia novas edições e exige consultar o estado no servidor antes de continuar.
+O backend continua sendo responsável pelas permissões, transação e prevenção
+de ajustes duplicados. Recarregar a página consulta o estado pelo ID da URL.
+
+Os dados simulados de divergência de caixa e seus gráficos foram retirados.
+Conciliação de caixa, vendas e relatórios ainda precisam de contratos próprios.
+A instalação de QA fornece o schema; o fluxo autenticado completo depende da
+configuração Firebase e de uma conta operacional vinculada.
+
+As telas de estoque e contagem foram verificadas em 375, 768 e 1440 pixels
+com respostas sintéticas interceptadas somente no navegador de teste. Foram
+verificados o foco na revisão, os formulários e a ausência de rolagem horizontal
+da página; tabelas mantêm rolagem própria acessível por teclado. Isso não
+substitui a validação das gravações com uma conta Firebase/operacional real.
+
+Quarto incremento: a página de avarias/consumo registra avarias e vencimentos
+em `/disposals`, usando lote e quantidade positiva. Conforme a decisão do
+usuário, consumo interno é uma movimentação `OUT` em
+`/inventory/{id}/movements`, com quantidade negativa e observação iniciada
+por `Consumo interno`. A tela exige um item do estoque normal com saldo,
+valida a quantidade e apresenta revisão antes da confirmação. Loja e funcionário
+são determinados pelo backend. Cada baixa enviada contém `Idempotency-Key`.
+
+Uma falha de conexão ou resposta inconclusiva preserva chave e payload enquanto
+a página estiver aberta, bloqueando alteração dos dados até reenviar a mesma
+solicitação. O reenvio permite ao servidor recuperar a operação já registrada.
+Se sair/recarregar durante uma falha, consulte o histórico antes de iniciar outra
+baixa: a tentativa pendente não é persistida entre visitas. Rejeições HTTP 4xx
+liberam a correção do formulário. Após sucesso, registros e estoque são
+consultados novamente; nenhum saldo é declarado atualizado apenas por cálculo
+local. As consultas usam período explícito de até seis meses. O histórico de
+consumo filtra movimentações `OUT` cuja observação começa com `Consumo interno`.
+
+Os valores financeiros, percentuais de faturamento e pico de vendas simulados
+foram retirados desta página, pois não pertencem às respostas desses recursos.
+Foram verificados o formulário, revisão e confirmação em 375, 768 e 1440 pixels
+com respostas sintéticas isoladas. As transações reais continuam dependentes
+da configuração Firebase e da conta operacional vinculada.
+
+Quinto incremento: transferências usam `/transfers` para solicitação com
+múltiplos lotes e histórico por período. Origem, solicitante e datas são
+determinados pelo servidor; a solicitação não movimenta estoque. O envio usa
+`PATCH /transfers/{id}/status` com `IN_TRANSIT` e retira o saldo da origem.
+Somente transferências em trânsito podem ser canceladas com `CANCELED`,
+devolvendo o saldo à origem. O recebimento usa
+`POST /transfers/{id}/receive`, credita o destino e conclui a transferência.
+Os antigos estados simulados `APPROVED` e `CANCELLED` não são enviados.
+
+As ações da interface são apresentadas de acordo com o estado e a loja atual
+do perfil: envio/cancelamento na origem e recebimento no destino. A API
+continua validando autorização e concorrência. Toda ação de saldo exige revisão
+e confirmação. Após falha, novas ações ficam bloqueadas até consultar o estado
+no servidor; PATCH de envio/cancelamento não é repetido automaticamente.
+Criação e recebimento preservam suas chaves de idempotência enquanto o editor
+permanece aberto. Após sair/recarregar durante uma falha de criação, consulte
+o histórico antes de solicitar novamente. Detalhes são reabertos por
+`/stock/transfers?id=ID`.
+
+A lista de destinos vem de `/stores`. Quando esse recurso retorna HTTP 403,
+a tela permite informar o identificador da loja de destino; não cria nomes ou
+lojas fictícias, e o servidor valida o destino. Outros erros de listagem são
+exibidos como falha. Recomendações de transferência simuladas foram removidas.
+
+As consultas de estoque, descartes, movimentações e transferências agora obtêm
+a loja de `/auth/profile` e enviam `storeId` explicitamente. Isso atende ao
+contrato que exige esse parâmetro para administradores, mantendo o contexto
+na loja do perfil em todos esses históricos. Não há cache de perfil entre
+sessões. Login e consultas usam o mesmo serviço de perfil.
+
+Solicitação, revisão, histórico e envio foram verificados em 375, 768 e
+1440 pixels com respostas sintéticas isoladas. Testes de comportamento cobrem
+recebimento, cancelamento, perda de resposta, reconciliação e limites de lote.
+Essas verificações não substituem o fluxo autenticado com Firebase e uma conta
+operacional real.
+
+Sexto incremento: funcionários e auditoria deixam de usar estado local como fonte
+de dados. `/users` consulta `/employees-store`; a seleção Empresa consulta
+`/employees-company`, restrita a administradores. Cargos vêm de
+`/employee-roles` e lojas de `/stores`. Os nomes dos cargos são rótulos do banco,
+não uma lista fixa de permissões. A API continua responsável pela autorização;
+uma recusa é mostrada como erro, sem apresentar uma lista vazia de sucesso.
+
+`/users/new` envia nome, CPF, contato, cargo, loja, data de admissão e a escolha
+explícita de criar acesso. Por padrão, cadastra sem acesso. Criar acesso solicita
+convite por e-mail e depende de ativação; uma resposta de sucesso confirma a
+operação, mas não garante a entrega do e-mail. A edição envia somente os campos
+aceitos por `PUT /employees/{id}`. CPF mascarado e loja são somente leitura;
+`roleId: null` preserva o cargo atual, pois a resposta não fornece seu identificador.
+Status e convite usam suas rotas próprias, sempre com revisão antes de confirmar.
+Como esses contratos não oferecem idempotência, uma resposta perdida bloqueia
+novo envio no formulário e orienta conferir o registro na lista antes de outra
+operação. O bloqueio dura enquanto o formulário permanece aberto.
+
+`/users/audit` consulta `/audit-logs` por período de até seis meses. Mostra data,
+identificador do usuário, tabela, operação e registro. Não inventa IP, nome do
+ator nem eventos no navegador e não expõe os objetos brutos de antes/depois.
+As consultas são canceladas ao sair da tela. A criação/edição substitui o antigo
+formulário local nessa rota; o componente legado não é utilizado por `/users`.
+
+Verificação deste incremento: 11 testes novos de contrato/validação e interação,
+checagem de tipos e análise estática dos arquivos alterados. Layout e foco foram
+verificados em 375, 768 e 1440 pixels, com respostas sintéticas da API e sem
+gravações no banco. As gravações reais e o envio de convites ainda dependem da
+configuração Firebase e de uma conta operacional com permissão administrativa.
+
+Sétimo incremento: o painel consulta catálogo, estoque e lotes pela API; a tela
+de validade lista somente lotes com data retornada pelo servidor, sem classificar
+urgência ou criar recomendações. A visão do motor, histórico comercial,
+relatórios e fechamento de caixa deixam de exibir amostras
+locais. Como os contratos correspondentes não estão integrados, essas telas
+informam a indisponibilidade e não geram resultados locais.
+
+Oitavo incremento: `/overview` consulta os alertas da loja de `/auth/profile`
+em `/alerts?storeId=ID`. Busca e filtro por status atuam somente nos registros
+retornados. O detalhe, reaberto por `/overview?alert=ID`, combina `/alerts/{id}`
+e `/alerts/{id}/suggested-actions`; as consultas são canceladas ao sair da tela.
+Não há geração local de previsão, alerta, sugestão ou valor financeiro.
+
+Alterar status envia `PATCH /alerts/{id}/status` após revisão. Aprovar/rejeitar
+uma sugestão pendente usa `POST /suggested-actions/{id}/decision`, com
+`APPROVED` ou `REJECTED`. A resposta do servidor atualiza a tela; não há alteração
+otimista nem chamada a `/execute`. Aprovar é uma decisão, não a execução da
+operação sugerida. A execução operacional continua pendente de integração dos
+formulários e contratos próprios de cada tipo de sugestão.
+
+Qualquer falha de mutação exige consultar novamente o alerta e suas sugestões
+antes de liberar outra operação. Uma falha nessa consulta mantém o bloqueio.
+Essa precaução evita repetir uma decisão aplicada cuja resposta se perdeu;
+não pressupõe idempotência nos contratos de status/decisão. O servidor permanece
+responsável por autorização, contexto da loja e concorrência. Os testes e a
+verificação visual usam dados sintéticos; o fluxo autenticado real permanece
+condicionado à configuração Firebase e à conta operacional vinculada.
+
+Verificação do oitavo incremento: 12 testes novos e 30 regressões de integração
+aprovados, análise estática dos arquivos envolvidos e compilação de produção.
+Layout, revisão, retorno de foco e texto ampliado a 200% foram verificados em
+375, 768 e 1440 pixels, sem transbordamento horizontal da página. As tabelas
+mantêm rolagem própria. As bordas dos campos usam a cor do texto para preservar
+contraste também quando o tema altera a cor da superfície.
+
+Nono incremento: sugestões pendentes ou aprovadas podem ser executadas em
+`POST /suggested-actions/{id}/execute`, com `Idempotency-Key`. A tela coleta os
+itens explicitamente, pois o DTO da sugestão não inclui produtos, lotes ou
+quantidades. Há formulários para pedido de compra, promoção, transferência,
+doação, descarte e pré-lista de reposição. Cada formulário envia somente os
+campos aceitos pelo respectivo tipo, após validação e revisão dos efeitos.
+
+Produtos, fornecedores, lojas e saldos são consultados pelos serviços já
+integrados, conforme a necessidade da operação. A loja do alerta precisa ser
+a mesma do perfil para evitar criar operações na loja errada. Para operações
+por lote, a interface considera somente estoque normal com saldo e limita a
+quantidade ao saldo consultado; essa é uma escolha conservadora da interface,
+e o servidor continua responsável pela validação final. Caso listar lojas
+retorne 403, a transferência admite informar o identificador conhecido do destino.
+O tipo da promoção usa os valores definidos no schema operacional fornecido.
+Quantidades e valores respeitam as casas decimais e os limites das colunas.
+
+O efeito é informado antes de confirmar: descarte baixa estoque imediatamente;
+transferência cria solicitação; doação cria registro para entrega posterior;
+promoção é criada inativa e pendente de aprovação; pedido de compra não registra
+recebimento; reposição cria apenas a pré-lista. Executar a sugestão não equivale
+a concluir as etapas posteriores desses registros. O comprovante exibe o tipo
+e o identificador retornados pela API, com link para transferências.
+
+Depois de uma resposta perdida, dados e chave permanecem congelados enquanto
+o formulário estiver aberto. Reenviar a mesma execução permite recuperar o
+resultado idempotente. Recusas HTTP 4xx permitem correção. Ao sair, a chave não
+é persistida; a tela orienta consultar o estado da sugestão antes de tentar de
+novo. O backend também bloqueia outra execução da mesma sugestão já executada.
+A interface não cria registros nem declara sucesso por cálculo local.
+
+Os testes usam respostas sintéticas. As gravações reais continuam dependendo
+do Firebase e da conta operacional vinculada. As etapas posteriores de aprovação,
+entrega, recebimento e movimentação têm contratos próprios; este incremento
+conecta a criação pela sugestão, sem executar essas etapas automaticamente.
+
+Verificação do nono incremento: 23 testes novos de contrato, validação e
+interação, além de 42 regressões de integração aprovadas. Os seis tipos foram
+verificados com dois itens em 375, 768 e 1440 pixels, incluindo revisão sem
+envio, retorno de foco, confirmação, atualização do alerta e texto ampliado a
+200%, com respostas sintéticas isoladas. Não houve transbordamento horizontal
+da página. Análise estática, tipos e compilação de produção aprovados.

@@ -51,6 +51,14 @@
     color: #b3261e !important;
 }
 
+:global(html[data-a11y-theme="dark"]:not([data-a11y-contrast="low"])) .warning {
+    color: #ffd1a3 !important;
+}
+
+:global(html[data-a11y-theme="dark"]:not([data-a11y-contrast="low"])) .danger {
+    color: #ffb4ab !important;
+}
+
 .footer {
     overflow: hidden;
     margin-top: auto;

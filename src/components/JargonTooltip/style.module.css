@@ -61,7 +61,7 @@
 
   /* Texto */
   overflow-wrap: break-word;
-  color: var(--a11y-tooltip-text, #fff);
+  color: var(--a11y-tooltip-text, var(--main-white));
   font-size: 0.9rem;
   font-weight: 400;
   line-height: 1.45;

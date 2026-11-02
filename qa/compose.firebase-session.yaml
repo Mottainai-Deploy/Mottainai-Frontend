@@ -1,0 +1,4 @@
+services:
+  api:
+    # Versão local com POST /auth/firebase; preserva a configuração e o banco.
+    image: mottainai-local-qa-api:firebase-session

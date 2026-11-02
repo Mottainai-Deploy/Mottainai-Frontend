@@ -68,9 +68,13 @@
 
 .feedback {
     margin: 0.75rem 0 0;
-    color: #205c1c;
+    color: var(--a11y-status-success-text);
     font-size: 0.8rem;
     font-weight: 700;
+}
+
+:global(html[data-a11y-theme="dark"]) .feedback {
+    color: var(--a11y-success-text);
 }
 
 .levelBadge {
@@ -90,19 +94,13 @@
 }
 
 .high {
-    background-color: #ffe7b0;
-    color: #8a5200;
+    background-color: var(--a11y-status-warning-surface);
+    color: var(--a11y-status-warning-text);
 }
 
 .critical {
-    background-color: #f9dfe1;
-    color: #8f151b;
-}
-
-:global(html[data-a11y-theme="dark"]) :global(body) .tableSection .moderate,
-:global(html[data-a11y-theme="dark"]) :global(body) .tableSection .high,
-:global(html[data-a11y-theme="dark"]) :global(body) .tableSection .critical {
-    color: var(--a11y-brand-text, var(--motta-blue)) !important;
+    background-color: var(--a11y-status-critical-surface);
+    color: var(--a11y-status-critical-text);
 }
 
 .tableSection {
@@ -110,14 +108,7 @@
 }
 
 .sr-only {
-    position: absolute;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    border: 0;
-    white-space: nowrap;
+    composes: visually-hidden from global;
 }
 
 @media (max-width: 640px) {

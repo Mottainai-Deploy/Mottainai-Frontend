@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import mottainaiLogo from '@/assets/icons/Logo-Orange.png';
 import darkRisingWave from '@/assets/imgs/post-login/onda-azul-escuro.svg';
 import lightRisingWave from '@/assets/imgs/post-login/onda-azul-claro.svg';
@@ -7,13 +7,10 @@ import circularWave from '@/assets/imgs/post-login/onda-circular.svg';
 import centralWave from '@/assets/imgs/post-login/onda-central.svg';
 import foamLayers from '@/assets/imgs/post-login/ondas-espuma.svg';
 import footerWaveLines from '@/assets/imgs/post-login/ondas-footer-linhas.svg';
-import progressCrane from '@/assets/imgs/post-login/tsuru-progresso.svg';
 import type { PostLoginLoadingProps } from '@/types/post-login-loading.types';
-import { POST_LOGIN_WAVE_DURATION_MS } from '@/utils/minimumLoadingDuration';
 import styles from './style.module.css';
 
 function PostLoginLoading({ onWaveComplete }: PostLoginLoadingProps) {
-    const [progress, setProgress] = useState(0);
     const darkWaveRef = useRef<HTMLDivElement>(null);
     const completionScheduled = useRef(false);
     const firstCompletionFrame = useRef<number | null>(null);
@@ -51,30 +48,6 @@ function PostLoginLoading({ onWaveComplete }: PostLoginLoadingProps) {
     }, []);
 
     useEffect(() => {
-        const startedAt = performance.now();
-        let progressFrameId: number | null = null;
-
-        const updateProgress = () => {
-            const elapsed = performance.now() - startedAt;
-            const nextProgress = Math.min(
-                (elapsed / POST_LOGIN_WAVE_DURATION_MS) * 99,
-                99,
-            );
-            setProgress(nextProgress);
-
-            if (nextProgress < 99) {
-                progressFrameId = window.requestAnimationFrame(updateProgress);
-            }
-        };
-
-        progressFrameId = window.requestAnimationFrame(updateProgress);
-
-        return () => {
-            if (progressFrameId !== null) window.cancelAnimationFrame(progressFrameId);
-        };
-    }, []);
-
-    useEffect(() => {
         const wave = darkWaveRef.current;
         if (!wave) return;
 
@@ -87,7 +60,6 @@ function PostLoginLoading({ onWaveComplete }: PostLoginLoadingProps) {
             }
 
             completionScheduled.current = true;
-            setProgress(100);
             firstCompletionFrame.current = window.requestAnimationFrame(() => {
                 secondCompletionFrame.current = window.requestAnimationFrame(onWaveComplete);
             });
@@ -113,7 +85,6 @@ function PostLoginLoading({ onWaveComplete }: PostLoginLoadingProps) {
         if (hasVisibleAnimation) return;
 
         completionScheduled.current = true;
-        setProgress(100);
         firstCompletionFrame.current = window.requestAnimationFrame(() => {
             secondCompletionFrame.current = window.requestAnimationFrame(onWaveComplete);
         });
@@ -127,8 +98,6 @@ function PostLoginLoading({ onWaveComplete }: PostLoginLoadingProps) {
             window.cancelAnimationFrame(secondCompletionFrame.current);
         }
     }, []);
-
-    const craneProgress = progress;
 
     return (
         <section
@@ -218,34 +187,6 @@ function PostLoginLoading({ onWaveComplete }: PostLoginLoadingProps) {
                     <img className={styles.fullFrameAsset} src={footerWaveLines} alt="" />
                 </div>
 
-                <div
-                    className={styles.progressTrack}
-                    role="progressbar"
-                    aria-label="Progresso da entrada"
-                    aria-valuemin={0}
-                    aria-valuemax={100}
-                    aria-valuenow={Math.floor(progress / 5) * 5}
-                    data-node-id="2024:37"
-                >
-                    <div
-                        className={styles.progressFill}
-                        style={{ width: `${progress}%` }}
-                        data-node-id="2024:38"
-                    />
-                    <span
-                        className={styles.progressCrane}
-                        style={{ left: `${craneProgress}%` }}
-                        aria-hidden="true"
-                    >
-                        <img
-                            className={styles.progressCraneArtwork}
-                            src={progressCrane}
-                            alt=""
-                            aria-hidden="true"
-                            decoding="async"
-                        />
-                    </span>
-                </div>
                 <p className={styles.loadingStatus} role="status" aria-live="polite" aria-atomic="true">
                     Preparando...
                 </p>

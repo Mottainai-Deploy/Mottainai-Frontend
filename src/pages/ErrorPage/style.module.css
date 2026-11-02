@@ -1,33 +1,354 @@
 .errorPage {
-    width: min(100% - 2rem, 42rem);
-    margin: clamp(1rem, 5vh, 3rem) auto;
-    padding: clamp(1.25rem, 4vw, 2rem);
-    color: var(--a11y-brand-text, var(--motta-blue));
-    background: var(--a11y-surface, var(--main-white));
-    border-radius: 0.75rem;
+  /* Layout */
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  overflow: hidden;
+
+  /* Tamanho */
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: clamp(2rem, 6vh, 4rem) clamp(1.25rem, 6vw, 5rem) clamp(10rem, 25vh, 14rem);
+
+  /* Aparência */
+  background-color: #17232e;
+
+  /* Texto */
+  color: #fff;
 }
 
-.errorPage button {
-    display: inline-block;
-    margin-top: 1rem;
-    padding: 0.65rem 1rem;
-    color: var(--a11y-brand-text, var(--motta-blue));
-    background: var(--a11y-surface, var(--main-white));
-    border: 2px solid var(--motta-blue);
-    border-radius: 0.4rem;
-    font-weight: 700;
-    cursor: pointer;
+.errorPage::before,
+.errorPage::after {
+  /* Layout */
+  position: absolute;
+  z-index: 0;
+
+  /* Tamanho */
+  width: 2.5rem;
+  height: 0.45rem;
+
+  /* Aparência */
+  border-radius: 999px;
+  background-color: #07589a;
+
+  /* Efeitos */
+  content: "";
 }
 
-.errorPage button:focus-visible {
-    outline: 3px solid var(--motta-orange);
-    outline-offset: 3px;
+.errorPage::before {
+  /* Layout */
+  top: 8%;
+  left: clamp(1.5rem, 6vw, 6rem);
+
+  /* Efeitos */
+  box-shadow: 0.75rem 0.8rem 0 #07589a;
 }
 
-@media (max-width: 420px) {
-    .errorPage {
-        width: calc(100% - 1.25rem);
-        margin: 0.75rem auto;
-        padding: 1rem;
-    }
+.errorPage::after {
+  /* Layout */
+  top: 8%;
+  right: clamp(1.5rem, 6vw, 6rem);
+
+  /* Efeitos */
+  box-shadow: -0.75rem 0.8rem 0 #07589a;
+}
+
+.brand {
+  /* Layout */
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+
+  /* Tamanho */
+  margin-bottom: 1.5rem;
+}
+
+.wordmark {
+  /* Layout */
+  position: relative;
+  display: block;
+
+  /* Texto */
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  text-align: center;
+}
+
+.wordmark::after {
+  /* Layout */
+  position: absolute;
+  bottom: -0.15em;
+  left: 50%;
+  transform: translateX(-50%);
+
+  /* Tamanho */
+  width: 42%;
+  height: 0.14rem;
+
+  /* Aparência */
+  border-radius: 999px;
+  background-color: #f56612;
+
+  /* Efeitos */
+  content: "";
+}
+
+.japanese {
+  /* Texto */
+  font-family: "Noto Sans JP", "Yu Gothic", Meiryo, sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.message {
+  /* Layout */
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(13rem, 0.7fr);
+  align-items: center;
+  gap: clamp(2rem, 8vw, 7rem);
+  flex: 1;
+
+  /* Tamanho */
+  width: min(100%, 64rem);
+  margin: 0 auto;
+}
+
+.message:focus {
+  /* Aparência */
+  outline: 3px solid #ff963d;
+  outline-offset: 0.75rem;
+}
+
+.messageCopy {
+  /* Layout */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.errorCode {
+  /* Tamanho */
+  margin-bottom: 0.75rem;
+
+  /* Texto */
+  color: #ff963d;
+  font-size: clamp(5rem, 12vw, 9rem);
+  font-weight: 700;
+  letter-spacing: -0.07em;
+  line-height: 0.85;
+}
+
+.title {
+  /* Tamanho */
+  max-width: 16ch;
+
+  /* Texto */
+  font-size: clamp(1.6rem, 3.6vw, 2.75rem);
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.description {
+  /* Tamanho */
+  max-width: 38ch;
+  margin-top: 1rem;
+
+  /* Texto */
+  color: #f0f3f5;
+  font-size: clamp(1rem, 1.6vw, 1.2rem);
+  line-height: 1.55;
+}
+
+.homeLink {
+  /* Layout */
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+
+  /* Tamanho */
+  min-height: 3rem;
+  margin-top: 2rem;
+  padding: 0.75rem 1.5rem;
+
+  /* Aparência */
+  border: 2px solid #ff963d;
+  border-radius: 999px;
+  background-color: #ff963d;
+
+  /* Texto */
+  color: #17232e;
+  font-weight: 700;
+  text-align: center;
+
+  /* Efeitos */
+  transition: background-color 160ms ease, color 160ms ease;
+}
+
+.homeLink:hover {
+  /* Aparência */
+  background-color: transparent;
+
+  /* Texto */
+  color: #fff;
+}
+
+.homeLink:focus-visible {
+  /* Aparência */
+  outline: 3px solid #fff !important;
+  outline-offset: 4px;
+}
+
+.errorArtwork {
+  /* Layout */
+  position: relative;
+  display: grid;
+  place-items: center;
+  justify-self: center;
+
+  /* Tamanho */
+  width: clamp(13rem, 25vw, 20rem);
+  aspect-ratio: 1;
+}
+
+.seal {
+  /* Tamanho */
+  width: 100%;
+  height: auto;
+}
+
+.cross {
+  /* Layout */
+  position: absolute;
+
+  /* Tamanho */
+  width: 40%;
+  height: auto;
+}
+
+.waves {
+  /* Layout */
+  position: absolute;
+  z-index: 0;
+  bottom: -1px;
+  left: 0;
+  pointer-events: none;
+
+  /* Tamanho */
+  width: 100%;
+  height: clamp(9rem, 25vh, 15rem);
+
+  /* Aparência */
+  background-image: url("../../assets/imgs/password-recovery/error-page-waves.svg");
+  background-position: center bottom;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+@media (max-width: 700px) {
+  .errorPage {
+    /* Layout */
+    justify-content: flex-start;
+
+    /* Tamanho */
+    padding: 2rem 1.25rem clamp(9rem, 22vh, 12rem);
+  }
+
+  .brand {
+    /* Tamanho */
+    margin-bottom: 1rem;
+  }
+
+  .message {
+    /* Layout */
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    gap: 0;
+  }
+
+  .errorArtwork {
+    /* Tamanho */
+    width: clamp(8rem, 38vw, 12rem);
+    margin-bottom: 1.5rem;
+  }
+
+  .messageCopy {
+    /* Layout */
+    align-items: center;
+  }
+
+  .errorCode {
+    /* Texto */
+    font-size: clamp(4.5rem, 20vw, 6.5rem);
+  }
+
+  .title,
+  .description {
+    /* Texto */
+    text-align: center;
+  }
+
+  .homeLink {
+    /* Tamanho */
+    margin-top: 1.5rem;
+  }
+
+  .waves {
+    /* Tamanho */
+    height: clamp(7.5rem, 20vh, 10rem);
+  }
+}
+
+@media (max-width: 380px) {
+  .errorPage {
+    /* Tamanho */
+    padding-inline: 1rem;
+  }
+
+  .errorArtwork {
+    /* Tamanho */
+    width: 7.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .title {
+    /* Texto */
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-height: 640px) and (min-width: 701px) {
+  .errorPage {
+    /* Tamanho */
+    padding-top: 1.5rem;
+    padding-bottom: 10rem;
+  }
+
+  .brand {
+    /* Tamanho */
+    margin-bottom: 0.5rem;
+  }
+
+  .errorArtwork {
+    /* Tamanho */
+    width: 12rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .homeLink {
+    /* Efeitos */
+    transition: none;
+  }
 }

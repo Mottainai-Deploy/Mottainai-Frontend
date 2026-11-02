@@ -6,7 +6,8 @@ export type AuthArtworkVariant =
   | 'recovery-code'
   | 'new-password'
   | 'password-updated'
-  | 'invalid-link';
+  | 'invalid-link'
+  | 'unavailable';
 
 export interface AuthLayoutProps {
   title: string;

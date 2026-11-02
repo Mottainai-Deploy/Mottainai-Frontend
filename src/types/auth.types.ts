@@ -19,10 +19,12 @@ export interface LoginCredentials {
 
 export interface LoginResponse {
   token: string;
+  user?: User;
 }
 
 // Tipo do objeto do autenticação do context
 export interface AuthContextData {
+  notice?: 'password-changed' | null;
   user: User | null;
   token: string | null;
   isAuthenticated: boolean;
@@ -38,6 +40,7 @@ export interface AuthProviderProps {
 }
 
 export interface AuthState {
+  notice: 'password-changed' | null;
   token: string | null;
   user: User | null;
   isLoggingIn: boolean;
@@ -48,11 +51,7 @@ export type AuthAction =
   | { type: 'login-started' }
   | { type: 'login-succeeded'; token: string; user: User }
   | { type: 'login-failed'; error: string }
-  | { type: 'logged-out' }
+  | { type: 'logged-out'; notice?: 'password-changed' }
   | { type: 'error-cleared' };
 
-export interface StoredAuthToken {
-  _versao: 1;
-  token: string;
-}
 import type { ReactNode } from 'react';

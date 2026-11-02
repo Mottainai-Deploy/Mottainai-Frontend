@@ -1,33 +1,24 @@
-import { useCallback, useState } from "react";
-import { Link } from "react-router-dom";
+import { useCallback, useEffect, useState } from "react";
+import { Link, useLocation, useSearchParams } from "react-router-dom";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import DetailsModal from "@/components/DetailsModal";
 import ProductsFilters from "@/components/ProductsFilters";
-import { products } from "@/data/products";
+import { getProducts } from '@/services/productService';
+import { useApiQuery } from '@/hooks/useApiQuery';
+import type { CatalogProduct } from '@/types/catalog-product.types';
 import type { DetailsModalField, OpenDetailsDialog } from "@/types/details-modal.types";
 import type {
-  EngineActionLevel,
   ProductFilterState,
-  Product,
-  ProductTrafficLight,
 } from "@/types/product.types";
 import styles from "./style.module.css";
+import PromotionOperations from '@/components/PromotionOperations';
 
-const engineActionLevels: Record<ProductTrafficLight, EngineActionLevel> = {
-  regular: "Moderado",
-  attention: "Alto",
-  critical: "Crítico",
-};
 
 const initialFilters: ProductFilterState = { search: "", category: "" };
 // Keyboard focus lets users scroll the product table horizontally without a pointer.
 const keyboardScrollProps = { tabIndex: 0 } as const;
 
-const currencyFormatter = new Intl.NumberFormat("pt-BR", {
-  style: "currency",
-  currency: "BRL",
-});
 
 const normalize = (value: string) =>
   value
@@ -37,20 +28,27 @@ const normalize = (value: string) =>
     .trim();
 
 function Products() {
+  const location = useLocation();
+  const [params] = useSearchParams();
+  const trackedPromotionValue = params.get('promotionId') ?? '';
+  const trackedPromotionId = /^[1-9]\d*$/.test(trackedPromotionValue) && Number.isSafeInteger(Number(trackedPromotionValue)) ? Number(trackedPromotionValue) : null;
+  useEffect(() => { document.getElementById('product-deleted-feedback')?.focus(); }, [location.key]);
+  const query = useApiQuery(getProducts, []);
+  const products = query.data;
   const [filters, setFilters] = useState<ProductFilterState>(initialFilters);
   const [detailsDialog, setDetailsDialog] =
-    useState<OpenDetailsDialog<Product> | null>(null);
+    useState<OpenDetailsDialog<CatalogProduct> | null>(null);
   const handleCloseDetails = useCallback(() => setDetailsDialog(null), []);
 
   const categories = Array.from(
-    new Set(products.map((product) => product.category)),
+    new Set(products.map((product) => product.categoryName)),
   );
 
   const search = normalize(filters.search);
 
   const filteredProducts = products.filter((product) => {
     const categoryMatches =
-      !filters.category || product.category === filters.category;
+      !filters.category || product.categoryName === filters.category;
     return (
       categoryMatches &&
       (!search ||
@@ -60,6 +58,7 @@ function Products() {
 
   return (
     <section className={styles.page} aria-labelledby="products-title">
+      {typeof location.state === 'object' && location.state !== null && 'productDeleted' in location.state && location.state.productDeleted === true && <p id="product-deleted-feedback" tabIndex={-1} role="status">Produto excluído ou não disponível na consulta atual. A lista foi consultada novamente.</p>}
       <h1 className={styles["sr-only"]} id="products-title">
         Produtos
       </h1>
@@ -76,10 +75,12 @@ function Products() {
       </div>
 
       <p className={styles["sr-only"]} role="status" aria-live="polite">
-        {filteredProducts.length} produtos encontrados.
+        {query.status === 'success' ? `${filteredProducts.length} produtos encontrados.` : ''}
       </p>
+      {query.status === 'loading' && <p role="status">Carregando produtos…</p>}
+      {query.status === 'error' && <p role="alert">{query.error}</p>}
 
-      <section className={styles.card} aria-labelledby="sku-list-title">
+      {query.status === 'success' && <section className={styles.card} aria-labelledby="sku-list-title">
         <h2 className={styles["list-title"]} id="sku-list-title">
           Lista de SKUs
         </h2>
@@ -96,13 +97,9 @@ function Products() {
                 <th scope="col">Código de barras</th>
                 <th scope="col">Produto</th>
                 <th scope="col">Categoria</th>
-                <th scope="col">Fornecedor</th>
-                <th scope="col">Estoque</th>
-                <th scope="col">Gôndola</th>
-                <th scope="col">Preço</th>
-                <th className={styles.center} scope="col">
-                  Nível
-                </th>
+                <th scope="col">SKU</th>
+                <th scope="col">Unidade de medida</th>
+                <th scope="col">Status</th>
                 <th className={styles.center} scope="col">
                   Ações
                 </th>
@@ -113,18 +110,10 @@ function Products() {
                 <tr key={product.id}>
                   <td>{product.barcode}</td>
                   <td>{product.name}</td>
-                  <td>{product.category}</td>
-                  <td>{product.supplier}</td>
-                  <td>{product.stockQuantity}</td>
-                  <td>{product.shelfQuantity}</td>
-                  <td>
-                    {currencyFormatter.format(product.priceInCents / 100)}
-                  </td>
-                  <td className={styles.center}>
-                    <span className={`${styles.levelBadge} ${styles[product.trafficLight]}`}>
-                      {engineActionLevels[product.trafficLight]}
-                    </span>
-                  </td>
+                  <td>{product.categoryName}</td>
+                  <td>{product.sku}</td>
+                  <td>{product.unitMeasure}</td>
+                  <td>{product.active ? 'Ativo' : 'Inativo'}</td>
                   <td className={styles.center}>
                     <button
                       className={`${styles["view-button"]} a11y-table-action table-action-transition`}
@@ -140,7 +129,7 @@ function Products() {
               ))}
               {filteredProducts.length === 0 && (
                 <tr>
-                  <td className={styles.empty} colSpan={9}>
+                  <td className={styles.empty} colSpan={7}>
                     Nenhum produto corresponde aos filtros informados.
                   </td>
                 </tr>
@@ -151,28 +140,26 @@ function Products() {
         <p className={styles["sr-only"]} id="sku-table-scroll-hint">
           Use as setas esquerda e direita para percorrer as colunas da tabela.
         </p>
-      </section>
+      </section>}
       {detailsDialog && (
         <DetailsModal
           title={detailsDialog.record.name}
-          description="Resumo cadastral do produto; o diagnóstico completo permanece disponível na página detalhada."
+          description="Dados cadastrais do produto."
           fields={[
             { id: "barcode", label: "Código de barras", value: detailsDialog.record.barcode },
-            { id: "category", label: "Categoria", value: detailsDialog.record.category },
-            { id: "supplier", label: "Fornecedor", value: detailsDialog.record.supplier },
-            { id: "stock", label: "Estoque", value: `${detailsDialog.record.stockQuantity} unidades` },
-            { id: "shelf", label: "Gôndola", value: `${detailsDialog.record.shelfQuantity} unidades` },
-            { id: "price", label: "Preço atual", value: currencyFormatter.format(detailsDialog.record.priceInCents / 100) },
-            { id: "level", label: "Nível", value: engineActionLevels[detailsDialog.record.trafficLight] },
+            { id: "category", label: "Categoria", value: detailsDialog.record.categoryName },
+            { id: "sku", label: "SKU", value: detailsDialog.record.sku },
+            { id: "status", label: "Status", value: detailsDialog.record.active ? 'Ativo' : 'Inativo' },
           ] satisfies DetailsModalField[]}
           triggerElement={detailsDialog.trigger}
           onClose={handleCloseDetails}
         >
           <Link className={styles["link"]} to={`/products/${detailsDialog.record.id}`}>
-            Abrir diagnóstico detalhado
+            Abrir cadastro detalhado
           </Link>
         </DetailsModal>
       )}
+      <PromotionOperations trackedPromotionId={trackedPromotionId} />
     </section>
   );
 }

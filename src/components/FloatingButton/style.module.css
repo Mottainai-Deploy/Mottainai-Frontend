@@ -39,13 +39,7 @@
   /* Efeitos */
   cursor: pointer;
   box-shadow: 0 3px 14px rgb(16 42 67 / 28%);
-  transition:
-    width calc(0.24s * var(--a11y-motion-factor, 1)) cubic-bezier(0.22, 1, 0.36, 1),
-    gap calc(0.24s * var(--a11y-motion-factor, 1)) cubic-bezier(0.22, 1, 0.36, 1),
-    padding calc(0.24s * var(--a11y-motion-factor, 1)) cubic-bezier(0.22, 1, 0.36, 1),
-    border-radius calc(0.24s * var(--a11y-motion-factor, 1)) cubic-bezier(0.22, 1, 0.36, 1),
-    background-color calc(0.2s * var(--a11y-motion-factor, 1)) ease,
-    box-shadow calc(0.2s * var(--a11y-motion-factor, 1)) ease;
+  transition: all calc(0.3s * var(--a11y-motion-factor, 1)) ease-in-out;
 }
 
 .trigger img {
@@ -68,9 +62,7 @@
 
   /* Efeitos */
   opacity: 0;
-  transition:
-    max-width calc(0.24s * var(--a11y-motion-factor, 1)) cubic-bezier(0.22, 1, 0.36, 1),
-    opacity calc(0.18s * var(--a11y-motion-factor, 1)) ease;
+  transition: all calc(0.3s * var(--a11y-motion-factor, 1)) ease-in-out;
 }
 
 .trigger:hover,
@@ -347,7 +339,7 @@
 
 :global(html[data-a11y-contrast="high"] body #root :where(*):not(img):not(video):not(svg)) .choice input:checked + span {
   /* Aparência */
-  border: 3px solid #fff !important;
+  border: 3px solid var(--main-white) !important;
   background-color: #ffd700 !important;
   background-image: repeating-linear-gradient(135deg, #ffd700 0 5px, #ff9900 5px 9px) !important;
   color: #000 !important;
@@ -365,7 +357,7 @@
   padding: 0.12rem 0.35rem;
 
   /* Aparência */
-  border: 1px solid #fff !important;
+  border: 1px solid var(--main-white) !important;
   border-radius: 999px;
   background-color: #000 !important;
 
@@ -378,7 +370,7 @@
 
 :global(html[data-a11y-contrast="high"] body #root :where(*):not(img):not(video):not(svg)) .toggles button[aria-pressed="true"] {
   /* Aparência */
-  border: 3px solid #fff !important;
+  border: 3px solid var(--main-white) !important;
   background-color: #00ffff !important;
   background-image: repeating-linear-gradient(45deg, #00ffff 0 6px, #00b8b8 6px 10px) !important;
   color: #000 !important;
@@ -396,7 +388,7 @@
   padding: 0.12rem 0.4rem;
 
   /* Aparência */
-  border: 1px solid #fff !important;
+  border: 1px solid var(--main-white) !important;
   border-radius: 999px;
   background-color: #000 !important;
 
@@ -428,6 +420,36 @@
     /* Texto */
     color: var(--main-white) !important;
     font-weight: bold;
+}
+
+:global(html[data-a11y-theme="dark"]:not([data-a11y-contrast="high"])) .toggles button[aria-pressed="true"] {
+  /* Aparência */
+  border-color: #6fa8ca !important;
+  background-color: #2d4557 !important;
+  box-shadow: inset 0.2rem 0 0 #6fa8ca;
+
+  /* Texto */
+  color: var(--main-white) !important;
+}
+
+:global(html[data-a11y-theme="dark"]:not([data-a11y-contrast="high"])) .toggles button[aria-pressed="true"] .activeTag {
+  /* Layout */
+  display: inline-flex;
+  align-items: center;
+
+  /* Tamanho */
+  padding: 0.12rem 0.4rem;
+
+  /* Aparência */
+  border: 1px solid #6fa8ca;
+  border-radius: 999px;
+  background-color: #17232e;
+
+  /* Texto */
+  color: #eaf6ff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  white-space: nowrap;
 }
 
 .status {

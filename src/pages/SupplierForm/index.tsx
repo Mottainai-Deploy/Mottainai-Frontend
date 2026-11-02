@@ -1,7 +1,9 @@
 import DropdownSelect from '@/components/DropdownSelect';
 import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
-import { supplierAddressOptions } from "@/data/suppliers";
+import { getAddresses } from '@/services/addressService';
+import { createSupplier } from '@/services/supplierService';
+import { useApiQuery } from '@/hooks/useApiQuery';
 import type {
   SupplierFormPageState,
   SupplierFormState,
@@ -31,6 +33,8 @@ function formatCnpj(value: string) {
 }
 
 function SupplierForm() {
+  const addresses = useApiQuery(getAddresses, []);
+  const [saving, setSaving] = useState(false);
   const [state, setState] = useState<SupplierFormPageState>({
     form: initialForm,
     errors: {},
@@ -51,8 +55,9 @@ function SupplierForm() {
     }));
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (saving || addresses.status !== 'success') return;
     const errors = validateSupplierForm(state.form);
     if (Object.keys(errors).length > 0) {
       setState((currentState) => ({
@@ -67,16 +72,27 @@ function SupplierForm() {
     const validatedForm = sanitizeSupplierForm(state.form);
     if (!validatedForm.tradeName || !validatedForm.addressId || validatedForm.cnpj.length !== 14) return;
 
-    setState({
+    setSaving(true);
+    try {
+      await createSupplier(validatedForm);
+      setState({
       form: initialForm,
       errors: {},
       feedback: "Fornecedor cadastrado com sucesso.",
       feedbackIsError: false,
-    });
+      });
+    } catch (error) {
+      setState((previous) => ({ ...previous, feedbackIsError: true,
+        feedback: error instanceof Error ? error.message : 'Não foi possível cadastrar o fornecedor.' }));
+    } finally { setSaving(false); }
   };
 
   return (
     <section className={styles.page} aria-labelledby="supplier-form-title">
+      {addresses.status === 'loading' && <p role="status">Carregando endereços…</p>}
+      {addresses.status === 'error' && <p role="alert">{addresses.error}</p>}
+      {addresses.status === 'success' && addresses.data.length === 0 && <p role="status">Não há endereços cadastrados disponíveis para este cadastro.</p>}
+      {saving && <p role="status">Cadastrando fornecedor…</p>}
       <form className={styles.card} onSubmit={handleSubmit}>
         <div className={styles.formHeader}>
           <div>
@@ -93,7 +109,7 @@ function SupplierForm() {
               id="supplier-trade-name"
               value={state.form.tradeName}
               onChange={(event) => updateForm("tradeName", event.target.value)}
-              maxLength={100}
+              maxLength={150}
               aria-invalid={Boolean(state.errors.tradeName)}
               aria-describedby={state.errors.tradeName ? "supplier-trade-name-error" : undefined}
               placeholder="Digite o nome do fornecedor"
@@ -125,7 +141,7 @@ function SupplierForm() {
               type="email"
               value={state.form.email}
               onChange={(event) => updateForm("email", event.target.value)}
-              maxLength={254}
+              maxLength={150}
               aria-invalid={Boolean(state.errors.email)}
               aria-describedby={state.errors.email ? "supplier-email-error" : undefined}
               placeholder="contato@empresa.com"
@@ -159,9 +175,9 @@ function SupplierForm() {
               required
             >
               <option value="">Selecione um endereço</option>
-              {supplierAddressOptions.map((address) => (
+              {addresses.data.map((address) => (
                 <option key={address.id} value={address.id}>
-                  {address.label}
+                  {address.street}, {address.number} — {address.city}/{address.state}
                 </option>
               ))}
             </DropdownSelect>
@@ -171,12 +187,14 @@ function SupplierForm() {
           <label className={styles.checkboxField} htmlFor="supplier-active">
             <input
               id="supplier-active"
+              disabled
               type="checkbox"
               checked={state.form.active}
               onChange={(event) => updateForm("active", event.target.checked)}
             />
             Fornecedor ativo
           </label>
+          <p>Novos fornecedores são criados ativos. O status pode ser alterado após o cadastro.</p>
         </div>
 
         {state.feedback && (
@@ -193,7 +211,7 @@ function SupplierForm() {
           <Link className={styles.cancelButton} to="/stock/suppliers">
             Cancelar cadastro
           </Link>
-          <button className={styles.submitButton} type="submit">
+          <button className={styles.submitButton} type="submit" disabled={saving || addresses.status !== 'success' || addresses.data.length === 0}>
             Cadastrar fornecedor
           </button>
         </div>

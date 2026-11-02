@@ -1,12 +1,12 @@
 import { Component } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import type {
   RouteLoadErrorBoundaryProps,
   RouteLoadErrorBoundaryState,
 } from "@/types/route-load-error-boundary.types";
 import styles from "./style.module.css";
 
-class RouteLoadErrorBoundary extends Component<
+class RouteLoadErrorBoundaryContent extends Component<
   RouteLoadErrorBoundaryProps,
   RouteLoadErrorBoundaryState
 > {
@@ -41,6 +41,9 @@ class RouteLoadErrorBoundary extends Component<
             <Link className={styles.returnLink} to="/">
               Voltar ao início
             </Link>
+            <button className={styles.returnLink} type="button" onClick={() => window.location.reload()}>
+              Recarregar página
+            </button>
           </section>
         </main>
       );
@@ -50,4 +53,9 @@ class RouteLoadErrorBoundary extends Component<
   }
 }
 
-export default RouteLoadErrorBoundary;
+export default function RouteLoadErrorBoundary(props: RouteLoadErrorBoundaryProps) {
+  const location = useLocation();
+
+  // Uma navegação, inclusive para a mesma URL, inicia uma nova tentativa de renderização.
+  return <RouteLoadErrorBoundaryContent key={location.key} {...props} />;
+}

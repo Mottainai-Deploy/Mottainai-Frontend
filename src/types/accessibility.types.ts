@@ -1,5 +1,5 @@
 export type AccessibilityPreferences = {
-  _versao: 1;
+  _versao: 3;
   textScale: number;
   theme: "system" | "light" | "dark";
   contrast: "normal" | "high" | "low";
@@ -8,6 +8,7 @@ export type AccessibilityPreferences = {
   jargonSupport: boolean;
   font: "default" | "verdana" | "arial" | "lexend" | "andika" | "comic" | "serif";
   spacing: number;
+  lineSpacing: number;
   motion: 0 | 25 | 50 | 100;
   border: 0 | 25 | 50 | 100;
   underline: boolean;

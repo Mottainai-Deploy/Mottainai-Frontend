@@ -3,7 +3,7 @@ import type { AccessibilityPreferences } from "@/types/accessibility.types";
 export const ACCESSIBILITY_STORAGE_KEY = "acessibility_v1";
 
 export const DEFAULT_ACCESSIBILITY_PREFERENCES: AccessibilityPreferences = {
-  _versao: 1,
+  _versao: 3,
   textScale: 0,
   theme: "system",
   contrast: "normal",
@@ -12,6 +12,7 @@ export const DEFAULT_ACCESSIBILITY_PREFERENCES: AccessibilityPreferences = {
   jargonSupport: true,
   font: "default",
   spacing: 0,
+  lineSpacing: 0,
   motion: 0,
   border: 0,
   underline: false,
@@ -35,7 +36,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 export function sanitizeAccessibilityPreferences(value: unknown): AccessibilityPreferences {
-  if (!isRecord(value) || value._versao !== 1) return { ...DEFAULT_ACCESSIBILITY_PREFERENCES };
+  if (!isRecord(value) || (value._versao !== 1 && value._versao !== 2 && value._versao !== 3)) return { ...DEFAULT_ACCESSIBILITY_PREFERENCES };
   const defaults = { ...DEFAULT_ACCESSIBILITY_PREFERENCES };
   const candidate = value as Partial<AccessibilityPreferences>;
   const themes = ["system", "light", "dark"] as const;
@@ -53,6 +54,9 @@ export function sanitizeAccessibilityPreferences(value: unknown): AccessibilityP
     ...defaults,
     textScale: typeof candidate.textScale === "number" ? Math.max(-1, Math.min(5, Math.round(candidate.textScale))) : defaults.textScale,
     spacing: typeof candidate.spacing === "number" ? Math.max(0, Math.min(2, Math.round(candidate.spacing * 10) / 10)) : defaults.spacing,
+    lineSpacing: typeof value.lineSpacing === "number"
+      ? Math.max(0, Math.min(2, Math.round(value.lineSpacing * 10) / 10))
+      : value.lineSpacing === true ? 2 : defaults.lineSpacing,
     theme: themes.includes(candidate.theme as (typeof themes)[number]) ? candidate.theme as AccessibilityPreferences["theme"] : defaults.theme,
     contrast: contrasts.includes(candidate.contrast as (typeof contrasts)[number]) ? candidate.contrast as AccessibilityPreferences["contrast"] : defaults.contrast,
     saturation: saturations.includes(candidate.saturation as (typeof saturations)[number]) ? candidate.saturation as AccessibilityPreferences["saturation"] : defaults.saturation,

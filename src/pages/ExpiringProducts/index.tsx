@@ -1,182 +1,59 @@
-import { useCallback, useState } from 'react';
-import EngineActionModal from '@/components/EngineActionModal';
-import ExpiringProductsFilters from '@/components/ExpiringProductsFilters';
+import { useMemo, useState } from 'react';
 import ReusableTable from '@/components/ReusableTable';
-import type { EngineDecisionStatus } from '@/types/engine-decision.types';
-import type { EngineActionDialogState } from '@/types/engine-action-modal.types';
-import type {
-    ExpirationRiskLevel,
-    ExpiringProductDecision,
-    ExpiringProductsFilterState,
-} from '@/types/expiring-products.types';
-import type { ReusableTableColumn, TableCellTone } from '@/types/reusable-table.types';
+import { useApiQuery } from '@/hooks/useApiQuery';
+import { getInventoryRows } from '@/services/inventoryService';
+import type { InventoryRow } from '@/types/inventory-api.types';
+import type { ReusableTableColumn } from '@/types/reusable-table.types';
+import { formatBatchDate, inventoryTypeLabels } from '@/utils/inventoryPresentation';
 import styles from './style.module.css';
 
-const statusTones: Record<EngineDecisionStatus, TableCellTone> = {
-    'Sem ação': 'neutral',
-    Aprovado: 'success',
-    'Em aguardo': 'warning',
-    Crítico: 'danger',
-    Editado: 'info',
-};
-
-const riskTones: Record<ExpirationRiskLevel, TableCellTone> = {
-    Crítico: 'danger',
-    Alto: 'warning',
-    Moderado: 'info',
-};
-
-function createDecisionColumns(
-    onViewAction: (decision: ExpiringProductDecision, trigger: HTMLButtonElement) => void,
-): ReusableTableColumn<ExpiringProductDecision>[] {
-    return [
-    {
-        id: 'sku',
-        header: 'SKU',
-        renderCell: (decision) => decision.sku,
-    },
-    {
-        id: 'store',
-        header: 'Loja',
-        renderCell: (decision) => decision.store,
-    },
-    {
-        id: 'category',
-        header: 'Categoria',
-        renderCell: (decision) => decision.category,
-    },
-    {
-        id: 'riskLevel',
-        header: 'Nível',
-        renderCell: (decision) => decision.riskLevel,
-        display: 'badge',
-        tone: (decision) => riskTones[decision.riskLevel],
-        align: 'center',
-    },
-    {
-        id: 'tactic',
-        header: 'Tática',
-        renderCell: (decision) => decision.tactic,
-    },
-    {
-        id: 'status',
-        header: 'Status',
-        renderCell: (decision) => decision.status,
-        display: 'badge',
-        tone: (decision) => statusTones[decision.status],
-        align: 'center',
-    },
-    {
-        id: 'action',
-        header: 'Ação',
-        renderCell: (decision) => decision.tactic,
-        display: 'action',
-        actionLabel: (decision) => `Ver ação sugerida pelo motor para o SKU ${decision.sku}`,
-        onAction: (decision, event) => onViewAction(decision, event.currentTarget),
-        align: 'center',
-    },
-    ];
-}
-
-const decisionData: ExpiringProductDecision[] = [
-    { id: 'decision-01', time: '14:32', sku: 'NIK-CAM-ESP-BRC-G', store: 'Loja Centro', category: 'Câmeras', riskLevel: 'Crítico', tactic: 'Desconto de 30%', status: 'Sem ação' },
-    { id: 'decision-02', time: '14:32', sku: 'NIK-CAM-ESP-BRC-P', store: 'Loja Norte', category: 'Câmeras', riskLevel: 'Alto', tactic: 'Sugestão de Compra', status: 'Aprovado' },
-    { id: 'decision-03', time: '14:32', sku: 'CAB-USB-C-2M', store: 'Loja Sul', category: 'Acessórios', riskLevel: 'Moderado', tactic: 'Doação', status: 'Em aguardo' },
-    { id: 'decision-04', time: '14:32', sku: 'FON-BT-PRO', store: 'Loja Centro', category: 'Áudio', riskLevel: 'Crítico', tactic: 'Promoção relâmpago', status: 'Crítico' },
-    { id: 'decision-05', time: '14:32', sku: 'FON-BT-LITE', store: 'Loja Norte', category: 'Áudio', riskLevel: 'Alto', tactic: 'Promoção relâmpago', status: 'Editado' },
-    { id: 'decision-06', time: '14:32', sku: 'SUP-NOT-ALU', store: 'Loja Sul', category: 'Acessórios', riskLevel: 'Crítico', tactic: 'Promoção relâmpago', status: 'Crítico' },
-    { id: 'decision-07', time: '14:32', sku: 'MOU-WLS-BLK', store: 'Loja Centro', category: 'Periféricos', riskLevel: 'Moderado', tactic: 'Promoção relâmpago', status: 'Editado' },
-    { id: 'decision-08', time: '14:32', sku: 'TEC-MEC-RGB', store: 'Loja Norte', category: 'Periféricos', riskLevel: 'Alto', tactic: 'Promoção relâmpago', status: 'Em aguardo' },
-    { id: 'decision-09', time: '14:32', sku: 'WEB-FHD-01', store: 'Loja Sul', category: 'Câmeras', riskLevel: 'Moderado', tactic: 'Promoção relâmpago', status: 'Sem ação' },
-    { id: 'decision-10', time: '14:32', sku: 'MIC-USB-PRO', store: 'Loja Centro', category: 'Áudio', riskLevel: 'Crítico', tactic: 'Promoção relâmpago', status: 'Sem ação' },
-    { id: 'decision-11', time: '14:32', sku: 'HUB-USB-7P', store: 'Loja Norte', category: 'Acessórios', riskLevel: 'Alto', tactic: 'Promoção relâmpago', status: 'Sem ação' },
-    { id: 'decision-12', time: '14:32', sku: 'MOU-PAD-XL', store: 'Loja Sul', category: 'Periféricos', riskLevel: 'Moderado', tactic: 'Promoção relâmpago', status: 'Sem ação' },
+const columns: ReusableTableColumn<InventoryRow>[] = [
+  { id: 'product', header: 'Produto', renderCell: (item) => item.productName },
+  { id: 'barcode', header: 'Código de barras', renderCell: (item) => item.barcode },
+  { id: 'batch', header: 'Lote', renderCell: (item) => item.batchCode },
+  { id: 'expiration', header: 'Validade registrada', renderCell: (item) => formatBatchDate(item.expirationDate) },
+  { id: 'quantity', header: 'Saldo atual', renderCell: (item) => `${item.currentQuantity.toLocaleString('pt-BR')} ${item.unitMeasure}`, align: 'end' },
+  { id: 'type', header: 'Tipo', renderCell: (item) => inventoryTypeLabels[item.inventoryType] },
 ];
 
-const riskLevels = Array.from(new Set(decisionData.map((decision) => decision.riskLevel)));
-const stores = Array.from(new Set(decisionData.map((decision) => decision.store)));
-const categories = Array.from(new Set(decisionData.map((decision) => decision.category)));
-
-const initialFilters: ExpiringProductsFilterState = {
-    riskLevel: '',
-    store: '',
-    category: '',
-};
-
 function ExpiringProducts() {
-    const [filters, setFilters] = useState<ExpiringProductsFilterState>(initialFilters);
-    const [actionDialog, setActionDialog] = useState<EngineActionDialogState | null>(null);
+  const inventory = useApiQuery<InventoryRow[]>(getInventoryRows, []);
+  const [search, setSearch] = useState('');
+  const expiringLots = useMemo(() => {
+    const normalizedSearch = search.trim().toLocaleLowerCase('pt-BR');
+    return inventory.data
+      .filter((item) => item.expirationDate !== null)
+      .filter((item) => !normalizedSearch || [item.productName, item.barcode, item.batchCode, item.expirationDate ?? '']
+        .join(' ').toLocaleLowerCase('pt-BR').includes(normalizedSearch))
+      .sort((first, second) => (first.expirationDate ?? '').localeCompare(second.expirationDate ?? ''));
+  }, [inventory.data, search]);
 
-    const handleViewAction = (decision: ExpiringProductDecision, trigger: HTMLButtonElement) => {
-        setActionDialog({
-            decision,
-            trigger,
-            contextFields: [
-                { id: 'store', label: 'Loja', value: decision.store },
-                { id: 'category', label: 'Categoria', value: decision.category },
-                { id: 'level', label: 'Nível', value: decision.riskLevel },
-            ],
-        });
-    };
+  return (
+    <section className={styles.page} aria-labelledby="expiring-title">
+      <h1 id="expiring-title">Validades registradas nos lotes</h1>
+      <p>Esta lista mostra as datas de validade retornadas pela API. A tela não classifica urgência nem sugere ações sem regras fornecidas pelo sistema.</p>
 
-    const handleCloseAction = useCallback(() => setActionDialog(null), []);
+      <label className={styles.filter} htmlFor="expiration-search">
+        Buscar produto, código, lote ou data
+        <input id="expiration-search" type="search" value={search} onChange={(event) => setSearch(event.target.value)} />
+      </label>
 
-    const decisionColumns = createDecisionColumns(handleViewAction);
-
-    const filteredDecisions = decisionData.filter((decision) => (
-        (!filters.riskLevel || decision.riskLevel === filters.riskLevel)
-        && (!filters.store || decision.store === filters.store)
-        && (!filters.category || decision.category === filters.category)
-    ));
-
-    const resultLabel = filteredDecisions.length === 1
-        ? '1 registro encontrado.'
-        : `${filteredDecisions.length} registros encontrados.`;
-
-    return (
-        <section aria-labelledby="expiring-products-title">
-            <h1 className={styles['sr-only']} id="expiring-products-title">Alertas de vencimento</h1>
-
-            <ExpiringProductsFilters
-                value={filters}
-                riskLevels={riskLevels}
-                stores={stores}
-                categories={categories}
-                onChange={setFilters}
-            />
-
-            <p className={styles['sr-only']} role="status" aria-live="polite">{resultLabel}</p>
-
-            <div className={styles.container}>
-                <div className={styles.page}>
-                    <ReusableTable
-                        title="Lotes com risco de vencimento"
-                        columns={decisionColumns}
-                        data={filteredDecisions}
-                        rowKey={(decision) => decision.id}
-                        emptyMessage="Nenhum lote corresponde aos filtros selecionados."
-                    />
-                </div>
-                <div className={styles.page}>
-                    <ReusableTable
-                        title="Decisões do motor – últimas 24 horas"
-                        columns={decisionColumns}
-                        data={filteredDecisions}
-                        rowKey={(decision) => decision.id}
-                        emptyMessage="Nenhuma decisão corresponde aos filtros selecionados."
-                    />
-                </div>
-            </div>
-            {actionDialog && (
-                <EngineActionModal
-                    decision={actionDialog.decision}
-                    contextFields={actionDialog.contextFields}
-                    triggerElement={actionDialog.trigger}
-                    onClose={handleCloseAction}
-                />
-            )}
-        </section>
-    );
+      {inventory.status === 'loading' && <p role="status">Carregando lotes…</p>}
+      {inventory.status === 'error' && <p role="alert">{inventory.error}</p>}
+      {inventory.status === 'success' && (
+        <>
+          <p role="status">{expiringLots.length === 1 ? '1 lote com validade informada.' : `${expiringLots.length} lotes com validade informada.`}</p>
+          <ReusableTable
+            title="Lotes com validade cadastrada"
+            columns={columns}
+            data={expiringLots}
+            rowKey={(item) => item.id}
+            emptyMessage="A API não retornou lotes com validade cadastrada para esta loja e busca."
+          />
+        </>
+      )}
+    </section>
+  );
 }
 
 export default ExpiringProducts;

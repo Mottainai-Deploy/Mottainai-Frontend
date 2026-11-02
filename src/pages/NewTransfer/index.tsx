@@ -1,242 +1,109 @@
+import { Link } from 'react-router-dom';
 import DropdownSelect from '@/components/DropdownSelect';
-import { useState, type FormEvent } from "react";
-import { Link } from "react-router-dom";
-import {
-  transferEmployeeOptions,
-  transferSuggestedActionOptions,
-  transferStoreOptions,
-} from "@/data/stock-transfers";
-import type {
-  NewTransferPageState,
-  TransferFormState,
-  TransferFormStatus,
-} from "@/types/stock-transfer.types";
-import { sanitizeTransferForm, validateTransferForm } from '@/utils/transferFormValidation';
-import styles from "./style.module.css";
+import { useNewTransfer } from '@/hooks/useNewTransfer';
+import { transferStatusLabels } from '@/utils/transferApiValidation';
+import styles from '@/styles/operations.module.css';
 
-const transferStatusOptions: readonly { value: TransferFormStatus; label: string }[] = [
-  { value: "REQUESTED", label: "Solicitada" },
-  { value: "APPROVED", label: "Aprovada" },
-  { value: "IN_TRANSIT", label: "Em trânsito" },
-  { value: "COMPLETED", label: "Concluída" },
-  { value: "CANCELLED", label: "Cancelada" },
-];
-
-const initialForm: TransferFormState = {
-  suggestedActionId: "",
-  sourceStoreId: "",
-  destinationStoreId: "",
-  employeeId: "",
-  requestDate: "2026-09-28T09:00",
-  completionDate: "",
-  status: "REQUESTED",
-  observation: "",
-};
-
-function NewTransfer() {
-  const [state, setState] = useState<NewTransferPageState>({
-    form: initialForm,
-    errors: {},
-    feedback: "",
-    feedbackIsError: false,
-  });
-
-  const updateForm = <K extends keyof TransferFormState>(
-    field: K,
-    value: TransferFormState[K],
-  ) => {
-    setState((currentState) => ({
-      ...currentState,
-      form: { ...currentState.form, [field]: value },
-      errors: { ...currentState.errors, [field]: undefined },
-      feedback: "",
-      feedbackIsError: false,
-    }));
-  };
-
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const errors = validateTransferForm(state.form);
-    if (Object.keys(errors).length > 0) {
-      setState((currentState) => ({
-        ...currentState,
-        errors,
-        feedback: "Revise os campos destacados antes de salvar a transferência.",
-        feedbackIsError: true,
-      }));
-      return;
-    }
-
-    const validatedForm = sanitizeTransferForm(state.form);
-    if (!validatedForm.employeeId || !validatedForm.sourceStoreId || !validatedForm.destinationStoreId) return;
-
-    setState({
-      form: initialForm,
-      errors: {},
-      feedback: "Transferência registrada com sucesso.",
-      feedbackIsError: false,
-    });
-  };
-
-  return (
-    <section className={styles.page} aria-labelledby="new-transfer-title">
-      <form className={styles.card} onSubmit={handleSubmit}>
-        <div className={styles.formHeader}>
-          <div>
-            <p className={styles.eyebrow}>Transferência de estoque</p>
-            <h1 id="new-transfer-title">Nova transferência</h1>
-          </div>
-          <span className={styles.requiredHint}>* Campos obrigatórios</span>
-        </div>
-
-        <div className={styles.formGrid}>
-          <div className={styles.formField}>
-            <label htmlFor="transfer-suggested-action">Ação sugerida</label>
-            <DropdownSelect
-              id="transfer-suggested-action"
-              value={state.form.suggestedActionId}
-              onChange={(event) => updateForm("suggestedActionId", event.target.value)}
-            >
-              <option value="">Nenhuma ação vinculada</option>
-              {transferSuggestedActionOptions.map((action) => (
-                <option key={action.id} value={action.id}>{action.label}</option>
-              ))}
-            </DropdownSelect>
-          </div>
-
-          <div className={styles.formField}>
-            <label htmlFor="transfer-employee">Responsável *</label>
-            <DropdownSelect
-              id="transfer-employee"
-              value={state.form.employeeId}
-              onChange={(event) => updateForm("employeeId", event.target.value)}
-              ariaInvalid={Boolean(state.errors.employeeId)}
-              ariaDescribedBy={state.errors.employeeId ? "transfer-employee-error" : undefined}
-              required
-            >
-              <option value="">Selecione um responsável</option>
-              {transferEmployeeOptions.map((employee) => (
-                <option key={employee.id} value={employee.id}>{employee.label}</option>
-              ))}
-            </DropdownSelect>
-            {state.errors.employeeId && <p className={styles.fieldError} id="transfer-employee-error" role="alert">{state.errors.employeeId}</p>}
-          </div>
-
-          <div className={styles.formField}>
-            <label htmlFor="transfer-source-store">Loja de origem *</label>
-            <DropdownSelect
-              id="transfer-source-store"
-              value={state.form.sourceStoreId}
-              onChange={(event) => updateForm("sourceStoreId", event.target.value)}
-              ariaInvalid={Boolean(state.errors.sourceStoreId)}
-              ariaDescribedBy={state.errors.sourceStoreId ? "transfer-source-error" : undefined}
-              required
-            >
-              <option value="">Selecione a loja de origem</option>
-              {transferStoreOptions.map((store) => (
-                <option key={store.id} value={store.id}>{store.label}</option>
-              ))}
-            </DropdownSelect>
-            {state.errors.sourceStoreId && <p className={styles.fieldError} id="transfer-source-error" role="alert">{state.errors.sourceStoreId}</p>}
-          </div>
-
-          <div className={styles.formField}>
-            <label htmlFor="transfer-destination-store">Loja de destino *</label>
-            <DropdownSelect
-              id="transfer-destination-store"
-              value={state.form.destinationStoreId}
-              onChange={(event) => updateForm("destinationStoreId", event.target.value)}
-              ariaInvalid={Boolean(state.errors.destinationStoreId)}
-              ariaDescribedBy={state.errors.destinationStoreId ? "transfer-destination-error" : undefined}
-              required
-            >
-              <option value="">Selecione a loja de destino</option>
-              {transferStoreOptions.map((store) => (
-                <option key={store.id} value={store.id}>{store.label}</option>
-              ))}
-            </DropdownSelect>
-            {state.errors.destinationStoreId && <p className={styles.fieldError} id="transfer-destination-error" role="alert">{state.errors.destinationStoreId}</p>}
-          </div>
-
-          <div className={styles.formField}>
-            <label htmlFor="transfer-request-date">Data da solicitação *</label>
-            <input
-              id="transfer-request-date"
-              type="datetime-local"
-              value={state.form.requestDate}
-              onChange={(event) => updateForm("requestDate", event.target.value)}
-              aria-invalid={Boolean(state.errors.requestDate)}
-              aria-describedby={state.errors.requestDate ? "transfer-request-date-error" : undefined}
-              required
-            />
-            {state.errors.requestDate && <p className={styles.fieldError} id="transfer-request-date-error" role="alert">{state.errors.requestDate}</p>}
-          </div>
-
-          <div className={styles.formField}>
-            <label htmlFor="transfer-completion-date">Data de conclusão</label>
-            <input
-              id="transfer-completion-date"
-              type="datetime-local"
-              value={state.form.completionDate}
-              onChange={(event) => updateForm("completionDate", event.target.value)}
-              aria-invalid={Boolean(state.errors.completionDate)}
-              aria-describedby={state.errors.completionDate ? "transfer-completion-date-error" : undefined}
-            />
-            {state.errors.completionDate && <p className={styles.fieldError} id="transfer-completion-date-error" role="alert">{state.errors.completionDate}</p>}
-          </div>
-
-          <div className={styles.formField}>
-            <label htmlFor="transfer-status">Status *</label>
-            <DropdownSelect
-              id="transfer-status"
-              value={state.form.status}
-              onChange={(event) => updateForm("status", event.target.value as TransferFormStatus)}
-              required
-            >
-              {transferStatusOptions.map((status) => (
-                <option key={status.value} value={status.value}>{status.label}</option>
-              ))}
-            </DropdownSelect>
-          </div>
-
-          <div className={`${styles.formField} ${styles.fullWidth}`}>
-            <label htmlFor="transfer-observation">Observação</label>
-            <textarea
-              id="transfer-observation"
-              value={state.form.observation}
-              onChange={(event) => updateForm("observation", event.target.value)}
-              maxLength={500}
-              aria-invalid={Boolean(state.errors.observation)}
-              aria-describedby={state.errors.observation ? "transfer-observation-error" : undefined}
-              placeholder="Descreva o motivo ou as orientações da transferência"
-              rows={4}
-            />
-            {state.errors.observation && <p className={styles.fieldError} id="transfer-observation-error" role="alert">{state.errors.observation}</p>}
-          </div>
-        </div>
-
-        {state.feedback && (
-          <p
-            className={`${styles.feedback} ${state.feedbackIsError ? styles.feedbackError : ""}`}
-            role={state.feedbackIsError ? "alert" : "status"}
-            aria-live="polite"
-          >
-            {state.feedback}
-          </p>
-        )}
-
-        <div className={styles.actions}>
-          <Link className={styles.cancelButton} to="/stock/transfers">
-            Cancelar transferência
-          </Link>
-          <button className={styles.submitButton} type="submit">
-            Salvar transferência
-          </button>
-        </div>
-      </form>
-    </section>
-  );
+export default function NewTransfer() {
+  const editor = useNewTransfer();
+  const { state } = editor;
+  const context = editor.context.data;
+  const inventoryMap = new Map(editor.inventory.data.map((item) => [String(item.id), item]));
+  const destination = context?.stores.find((store) => String(store.id) === state.form.destinationStoreId);
+  const locked = editor.blocked || state.reviewing;
+  return <section className={styles.page} aria-labelledby="new-transfer-title">
+    <h1 id="new-transfer-title">Nova transferência</h1>
+    <Link className={styles.link} to="/stock/transfers">Voltar ao histórico</Link>
+    {state.message && <p id="transfer-create-feedback" tabIndex={-1} className={styles.feedback} role={state.failed ? 'alert' : 'status'}>{state.message}</p>}
+    {(editor.context.status === 'loading' || editor.inventory.status === 'loading') && <p role="status">Carregando loja e estoque disponíveis…</p>}
+    {editor.context.status === 'error' && <p role="alert">{editor.context.error}</p>}
+    {editor.inventory.status === 'error' && <p role="alert">{editor.inventory.error}</p>}
+    {!state.created && <form className={styles.card} onSubmit={editor.review} noValidate>
+      <p>A solicitação não retira estoque. A retirada ocorre ao enviar a transferência.</p>
+      {context && <p>Origem: loja {context.profile.storeId}. Solicitante: {context.profile.name}.</p>}
+      <fieldset className={styles.fields} disabled={locked || !editor.ready}>
+        <legend>Destino e lotes</legend>
+        <label className={styles.field} htmlFor="transfer-destination">Loja de destino *
+          {context?.storeListAvailable ? <DropdownSelect id="transfer-destination" value={state.form.destinationStoreId} required
+            ariaInvalid={Boolean(state.errors.destinationStoreId)} ariaDescribedBy={state.errors.destinationStoreId ? 'transfer-destination-error' : undefined}
+            onChange={(event) => editor.change('destinationStoreId', event.target.value)}>
+            <option value="">Selecione uma loja</option>
+            {editor.destinations.map((store) => <option key={store.id} value={store.id}>{store.name} — {store.id}</option>)}
+          </DropdownSelect> : <input id="transfer-destination" inputMode="numeric" value={state.form.destinationStoreId} required
+            aria-invalid={Boolean(state.errors.destinationStoreId)} aria-describedby={state.errors.destinationStoreId ? 'transfer-destination-error' : 'transfer-destination-hint'}
+            onChange={(event) => editor.change('destinationStoreId', event.target.value)} />}
+        </label>
+        {context && !context.storeListAvailable && <p id="transfer-destination-hint">A listagem de lojas não está disponível para sua conta. Informe o identificador fornecido pela loja de destino; o servidor validará o acesso.</p>}
+        {state.errors.destinationStoreId && <span id="transfer-destination-error">{state.errors.destinationStoreId}</span>}
+        {context?.storeListAvailable && editor.destinations.length === 0 && <p role="status">Não há outras lojas ativas disponíveis.</p>}
+        <fieldset id="transfer-items" className={styles.fields} tabIndex={-1} aria-describedby={state.errors.items ? 'transfer-items-error' : undefined}>
+          <legend>Lotes e quantidades *</legend>
+          {state.form.items.map((item, index) => <div key={item.id} className={styles.card}>
+            <div className={styles.grid}>
+              <label className={styles.field} htmlFor={`transfer-batch-${item.id}`}>Produto / lote {index + 1}
+                <DropdownSelect id={`transfer-batch-${item.id}`} value={item.inventoryId} required
+                  ariaInvalid={Boolean(state.errors.items)} ariaDescribedBy={state.errors.items ? 'transfer-items-error' : undefined}
+                  onChange={(event) => editor.changeItem(item.id, 'inventoryId', event.target.value)}>
+                  <option value="">Selecione um lote do estoque normal</option>
+                  {editor.available.map((row) => <option key={row.id} value={row.id}>{row.productName} — {row.batchCode} — saldo {row.currentQuantity.toLocaleString('pt-BR')} {row.unitMeasure}</option>)}
+                </DropdownSelect>
+              </label>
+              <label className={styles.field} htmlFor={`transfer-quantity-${item.id}`}>Quantidade do lote {index + 1}
+                <input id={`transfer-quantity-${item.id}`} inputMode="decimal" required value={item.quantity}
+                  aria-invalid={Boolean(state.errors.items)} aria-describedby={state.errors.items ? 'transfer-items-error' : undefined}
+                  onChange={(event) => editor.changeItem(item.id, 'quantity', event.target.value)} />
+              </label>
+            </div>
+            <button type="button" onClick={() => {
+              editor.removeItem(item.id);
+              window.requestAnimationFrame(() => document.getElementById('transfer-add-item')?.focus());
+            }}>Remover lote {index + 1}</button>
+          </div>)}
+          {state.errors.items && <span id="transfer-items-error">{state.errors.items}</span>}
+          <button id="transfer-add-item" type="button" onClick={() => {
+            editor.addItem();
+            window.requestAnimationFrame(() => {
+              const selects = document.querySelectorAll<HTMLSelectElement>('[id^="transfer-batch-"]');
+              selects[selects.length - 1]?.focus();
+            });
+          }}>Adicionar lote</button>
+        </fieldset>
+        <label className={styles.field} htmlFor="transfer-observation">Observação
+          <textarea id="transfer-observation" rows={3} maxLength={500} value={state.form.observation}
+            aria-invalid={Boolean(state.errors.observation)} aria-describedby={state.errors.observation ? 'transfer-observation-error' : undefined}
+            onChange={(event) => editor.change('observation', event.target.value)} />
+        </label>
+        {state.errors.observation && <span id="transfer-observation-error">{state.errors.observation}</span>}
+      </fieldset>
+      <button id="transfer-create-review-button" type="submit" disabled={locked || !editor.ready || editor.available.length === 0}>Revisar solicitação</button>
+      {editor.inventory.status === 'success' && editor.available.length === 0 && <p role="status">Não há lotes com saldo no estoque normal da origem.</p>}
+    </form>}
+    {state.reviewing && !state.pending && <section className={styles.card} aria-labelledby="transfer-create-review">
+      <h2 id="transfer-create-review" tabIndex={-1}>Revisar solicitação de transferência</h2>
+      <p>Origem: loja {context?.profile.storeId}. Destino: {destination?.name || `loja ${state.form.destinationStoreId}`}.</p>
+      <ul>{state.form.items.map((item) => { const row = inventoryMap.get(item.inventoryId); return <li key={item.id}>{row ? `${row.productName} — ${row.batchCode}` : `Item de estoque ${item.inventoryId}`}: {item.quantity} {row?.unitMeasure}</li>; })}</ul>
+      <p>Observação: {state.form.observation || 'Não informada'}.</p>
+      <p>O saldo só será retirado na etapa de envio.</p>
+      <div className={styles.actions}>
+        <button type="button" disabled={editor.blocked || !editor.ready} onClick={editor.confirm}>Confirmar solicitação</button>
+        <button id="transfer-create-cancel-review" type="button" disabled={editor.blocked} onClick={editor.cancelReview}>Voltar à edição</button>
+      </div>
+    </section>}
+    {state.pending && !state.busy && <section className={styles.card}>
+      <h2>Solicitação ainda não confirmada</h2>
+      <p>Destino: loja {state.pending.payload.destinationStoreId}. {state.pending.payload.items.length} lotes.</p>
+      <p>Reenviar mantém os mesmos dados e chave. Mantenha a página aberta até confirmar o resultado; ao sair ou recarregar, consulte o histórico antes de solicitar novamente.</p>
+      <button type="button" onClick={editor.retry}>Reenviar a mesma solicitação</button>
+    </section>}
+    {state.created && <section className={styles.card}>
+      <h2>Transferência {state.created.id}</h2>
+      <p role="status">Status confirmado: {transferStatusLabels[state.created.status]}.</p>
+      <p>Origem: loja {state.created.sourceStoreId}. Destino: loja {state.created.destinationStoreId}.</p>
+      <Link className={styles.link} to={`/stock/transfers?id=${state.created.id}`}>Abrir transferência para acompanhar e enviar</Link>
+      <button type="button" onClick={() => {
+        editor.reset();
+        window.requestAnimationFrame(() => document.getElementById('transfer-destination')?.focus());
+      }}>Iniciar outra solicitação</button>
+    </section>}
+  </section>;
 }
-
-export default NewTransfer;
-

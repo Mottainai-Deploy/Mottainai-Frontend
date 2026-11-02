@@ -19,6 +19,8 @@ export interface SupplierFormState {
 }
 
 export interface SupplierPageState {
+  saving: boolean;
+  deletionUncertain: boolean;
   search: string;
   records: SupplierRecord[];
   selectedSupplierId: string;
@@ -30,6 +32,8 @@ export interface SupplierPageState {
 export interface SupplierEditState {
   tradeName: string;
   active: boolean;
+  email?: string;
+  phone?: string;
 }
 
 export interface SupplierFormPageState {

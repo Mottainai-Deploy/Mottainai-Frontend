@@ -56,7 +56,7 @@
 .inlineField select {
     min-height: 2rem;
     padding: 0.3rem 0.6rem;
-    border: 1px solid #d5d0ca;
+    border: 1px solid var(--a11y-form-control-border);
     border-radius: 0.45rem;
     background: var(--a11y-surface, var(--main-white));
     color: var(--a11y-text-muted, #625d58);
@@ -78,7 +78,7 @@
 
 .fieldError {
     /* Texto */
-    color: #a32720;
+    color: var(--a11y-field-error-text);
     font-size: 0.8rem;
     font-weight: 600;
 }
@@ -127,7 +127,7 @@
     min-width: 0;
     min-height: 2.3rem;
     padding: 0.45rem 0.7rem;
-    border: 1px solid #d5d0ca;
+    border: 1px solid var(--a11y-form-control-border);
     border-radius: 0.45rem;
     color: var(--a11y-text-muted, #373431);
     font: inherit;
@@ -167,23 +167,32 @@
 }
 
 .cancelButton {
-    border: 2px solid #9b3035;
-    background: #fff2f2;
-    color: #8f151b;
+    border: 2px solid var(--a11y-danger-border);
+    background: var(--a11y-danger-surface);
+    color: var(--a11y-status-critical-text);
 }
 
 .cancelButton:hover {
-    background: #f9dfe1;
+    background: var(--a11y-status-critical-surface);
 }
 
 .successMessage {
-    color: #205c1c;
+    color: var(--a11y-status-success-text);
     font-weight: 700;
 }
 
 .errorMessage {
-    color: #8f1d18;
+    color: var(--a11y-feedback-error-text);
     font-weight: 700;
+}
+
+:global(html[data-a11y-theme="dark"]) .fieldError,
+:global(html[data-a11y-theme="dark"]) .errorMessage {
+    color: var(--a11y-error-text);
+}
+
+:global(html[data-a11y-theme="dark"]) .successMessage {
+    color: var(--a11y-success-text);
 }
 
 .actions {
@@ -203,14 +212,7 @@
 }
 
 .sr-only {
-    position: absolute;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    border: 0;
-    white-space: nowrap;
+    composes: visually-hidden from global;
 }
 
 @media (max-width: 700px) {

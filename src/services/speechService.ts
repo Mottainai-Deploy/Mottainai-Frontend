@@ -1,13 +1,4 @@
-import type { SpeechOptions, SpeechResult } from "@/types/speech.types";
-
-interface ActiveSpeechRun {
-  id: number;
-  cancel: () => void;
-  pause: () => void;
-  resume: () => void;
-  updateRate: (rate: number) => void;
-  promise: Promise<SpeechResult>;
-}
+import type { ActiveSpeechRun, SpeechOptions, SpeechResult } from "@/types/speech.types";
 
 const MAX_CHUNK_LENGTH = 220;
 let nextRunId = 0;

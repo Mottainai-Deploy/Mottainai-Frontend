@@ -86,12 +86,16 @@
 
 .medium {
     background-color: #ffe5ad;
-    color: #8a5200;
+    color: var(--a11y-status-warning-text);
 }
 
 .low {
     background-color: #dedede;
     color: var(--a11y-text-muted, #686868);
+}
+
+:global(html[data-a11y-theme="dark"]) .low {
+    color: #102a43;
 }
 
 @media (max-width: 1024px) {

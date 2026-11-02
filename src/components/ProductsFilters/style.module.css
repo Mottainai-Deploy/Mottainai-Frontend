@@ -19,7 +19,7 @@
     width: 100%;
     min-height: 2.6rem;
     padding: 0.55rem 0.85rem;
-    border: 1px solid #d5d0ca;
+    border: 1px solid var(--a11y-form-control-border);
     border-radius: 0.55rem;
     background: var(--a11y-surface, var(--main-white));
     color: var(--a11y-text-muted, #373431);
@@ -37,14 +37,7 @@
 }
 
 .sr-only {
-    position: absolute;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    border: 0;
-    white-space: nowrap;
+    composes: visually-hidden from global;
 }
 
 @media (max-width: 680px) {

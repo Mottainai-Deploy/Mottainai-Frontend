@@ -57,13 +57,21 @@
 
 .feedback {
     margin: 0.75rem 0 0;
-    color: #205c1c;
+    color: var(--a11y-status-success-text);
     font-size: 0.8rem;
     font-weight: 700;
 }
 
 .feedbackError {
-    color: #8f1d18;
+    color: var(--a11y-feedback-error-text);
+}
+
+:global(html[data-a11y-theme="dark"]) .feedbackError {
+    color: var(--a11y-error-text);
+}
+
+:global(html[data-a11y-theme="dark"]) .feedback {
+    color: var(--a11y-success-text);
 }
 
 .editPanel {
@@ -96,28 +104,46 @@
 }
 
 .editFields {
-    display: flex;
+    /* Layout */
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     align-items: end;
     gap: 1rem;
+
+    /* Tamanho */
+    min-width: 0;
 }
 
 .editField {
+    /* Layout */
     display: grid;
-    flex: 1;
     gap: 0.35rem;
-    color: var(--a11y-text-muted, #373431);
+
+    /* Tamanho */
+    min-width: 0;
+
+    /* Texto */
     font-size: 0.8rem;
     font-weight: 700;
+    color: var(--a11y-text-muted, #373431);
 }
 
 .editField input {
-    min-height: 2.35rem;
+    /* Tamanho */
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    min-height: 2.75rem;
     padding: 0.45rem 0.7rem;
-    border: 1px solid #bcb5ae;
+
+    /* Aparência */
+    background-color: var(--a11y-surface-raised, #f5f1ee);
     border-radius: 0.45rem;
-    background: var(--a11y-surface-raised, #f5f1ee);
-    color: var(--a11y-text-muted, #625d58);
+    border: 1px solid currentColor;
+
+    /* Texto */
     font: inherit;
+    color: var(--a11y-text-muted, #625d58);
 }
 
 .editCheckbox {
@@ -162,9 +188,9 @@
 }
 
 .cancelEditButton {
-    border: 1px solid #9b3035;
-    background: #fff2f2;
-    color: #8f151b;
+    border: 1px solid var(--a11y-danger-border);
+    background: var(--a11y-danger-surface);
+    color: var(--a11y-status-critical-text);
 }
 
 .saveEditButton {
@@ -174,7 +200,7 @@
 }
 
 .cancelEditButton:hover {
-    background: #ffe1e1;
+    background: var(--a11y-danger-hover-surface);
 }
 
 .saveEditButton:hover {
@@ -187,7 +213,7 @@
     padding: 0.3rem 0.75rem;
     border: 0;
     border-radius: 0.35rem;
-    background: #ded8d0;
+    background: var(--a11y-action-surface);
     color: var(--a11y-text-muted, #373431);
     font: inherit;
     font-size: 0.75rem;
@@ -206,14 +232,7 @@
 }
 
 .sr-only {
-    position: absolute;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    border: 0;
-    white-space: nowrap;
+    composes: visually-hidden from global;
 }
 
 @media (max-width: 640px) {
@@ -239,5 +258,12 @@
     .cancelEditButton,
   .saveEditButton {
         width: 100%;
+    }
+}
+
+@media (max-width: 640px) {
+    .editFields {
+        /* Layout */
+        grid-template-columns: 1fr;
     }
 }

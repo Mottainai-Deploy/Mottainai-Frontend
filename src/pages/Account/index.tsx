@@ -1,5 +1,6 @@
 import { useAuth } from "@/hooks/useAuth";
 import styles from "./style.module.css";
+import PasswordChange from '@/components/PasswordChange';
 
 function Account() {
   const { user } = useAuth();
@@ -26,6 +27,7 @@ function Account() {
           <dd>{user?.id || "Não informado"}</dd>
         </div>
       </dl>
+      <PasswordChange />
     </section>
   );
 }

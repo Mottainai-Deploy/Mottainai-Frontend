@@ -1,0 +1,296 @@
+.dialog:not([open]) {
+  display: none;
+}
+
+.dialog[open] {
+  display: block;
+  animation: errorDialogEnter calc(180ms * var(--a11y-motion-factor, 1)) ease-out both;
+}
+
+.dialog {
+  /* Layout */
+  position: fixed;
+  inset: 0;
+  isolation: isolate;
+  overflow: auto;
+  margin: auto;
+
+  /* Tamanho */
+  width: min(42rem, calc(100vw - 2rem));
+  max-height: min(90vh, 44rem);
+  max-height: min(90dvh, 44rem);
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+
+  /* Aparência */
+  border: 1px solid #496274;
+  border-radius: 1.5rem;
+  background-color: #17232e;
+  box-shadow: 0 1.25rem 3rem rgb(0 0 0 / 40%);
+
+  /* Texto */
+  color: #fff5ed;
+  font-family: inherit;
+}
+
+.dialog::backdrop {
+  background-color: rgb(4 12 18 / 78%);
+}
+
+.brand,
+.content,
+.confirm {
+  position: relative;
+  z-index: 1;
+}
+
+.brand {
+  /* Layout */
+  display: grid;
+  justify-items: center;
+  gap: 0.15rem;
+}
+
+.brandWordmark {
+  /* Texto */
+  color: #fff5ed;
+  font-size: clamp(2.5rem, 8vw, 3.5rem);
+  font-weight: 600;
+  letter-spacing: -0.055em;
+  line-height: 1;
+}
+
+.brandJapanese {
+  /* Texto */
+  color: #fff5ed;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.content {
+  /* Layout */
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(7rem, 23vw, 10rem);
+  align-items: center;
+  gap: clamp(1rem, 4vw, 2.5rem);
+
+  /* Tamanho */
+  margin: clamp(2rem, 6vw, 3.5rem) 0 3rem;
+}
+
+.copy h2 {
+  /* Tamanho */
+  margin: 0;
+
+  /* Texto */
+  color: #fff5ed;
+  font-size: clamp(1.4rem, 4.5vw, 2rem);
+  line-height: 1.2;
+}
+
+.eyebrow {
+  /* Tamanho */
+  margin: 0 0 0.5rem;
+
+  /* Texto */
+  color: #ff963d;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.message {
+  /* Tamanho */
+  margin: 0.75rem 0 0;
+
+  /* Texto */
+  color: #e7edf1;
+  font-size: clamp(1rem, 2.8vw, 1.15rem);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.errorMark {
+  /* Layout */
+  position: relative;
+
+  /* Tamanho */
+  width: 100%;
+  aspect-ratio: 1;
+}
+
+.errorMark img {
+  /* Layout */
+  position: absolute;
+  inset: 0;
+
+  /* Tamanho */
+  width: 100%;
+  height: 100%;
+}
+
+.waves {
+  /* Layout */
+  position: absolute;
+  z-index: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  overflow: hidden;
+  pointer-events: none;
+
+  /* Tamanho */
+  height: 5.5rem;
+}
+
+.wave {
+  /* Layout */
+  position: absolute;
+  bottom: -45%;
+
+  /* Tamanho */
+  height: 130%;
+
+  /* Aparência */
+  border-radius: 50% 50% 0 0 / 42% 42% 0 0;
+}
+
+.waveBlue {
+  /* Layout */
+  left: -8%;
+
+  /* Tamanho */
+  width: 74%;
+
+  /* Aparência */
+  background-color: #075a98;
+  transform: rotate(4deg);
+}
+
+.waveOrange {
+  /* Layout */
+  right: -8%;
+  bottom: -58%;
+
+  /* Tamanho */
+  width: 38%;
+  height: 145%;
+
+  /* Aparência */
+  background-color: #f96317;
+}
+
+.waveCyan {
+  /* Layout */
+  right: 8%;
+  bottom: -72%;
+  left: 9%;
+
+  /* Aparência */
+  background-color: #0783b6;
+  transform: rotate(-2deg);
+}
+
+.confirm {
+  /* Layout */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+  /* Tamanho */
+  min-width: 8rem;
+  min-height: 2.75rem;
+  padding: 0.65rem 1.25rem;
+
+  /* Aparência */
+  border: 2px solid #ff963d;
+  border-radius: 0.65rem;
+  background-color: #ff963d;
+
+  /* Texto */
+  color: #17232e;
+  font: inherit;
+  font-weight: 800;
+
+  /* Efeitos */
+  transition: background-color calc(0.2s * var(--a11y-motion-factor, 1)) ease-in-out;
+}
+
+.confirm:hover {
+  /* Aparência */
+  background-color: #ffb36b;
+}
+
+.confirm:focus-visible {
+  /* Aparência */
+  outline: 3px solid #fff5ed;
+  outline-offset: 3px;
+}
+
+.dialog::backdrop {
+  animation: backdropFadeIn calc(180ms * var(--a11y-motion-factor, 1)) ease-out both;
+}
+
+@keyframes errorDialogEnter {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes backdropFadeIn {
+  from { background-color: rgb(4 12 18 / 0%); }
+  to { background-color: rgb(4 12 18 / 78%); }
+}
+
+@media (max-width: 520px) {
+  .dialog {
+    /* Tamanho */
+    width: calc(100vw - 1rem);
+    max-height: calc(100dvh - 1rem - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    padding: 1.5rem 1.25rem;
+  }
+
+  .content {
+    /* Layout */
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 1rem;
+    text-align: center;
+
+    /* Tamanho */
+    margin: 1.5rem 0 2rem;
+  }
+
+  .errorMark {
+    /* Tamanho */
+    width: clamp(6rem, 28vw, 8rem);
+    grid-row: 1;
+  }
+
+  .copy {
+    /* Layout */
+    grid-row: 2;
+  }
+
+  .confirm {
+    /* Tamanho */
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dialog[open],
+  .dialog::backdrop,
+  .confirm {
+    animation: none;
+    transition: none;
+  }
+}

@@ -66,6 +66,7 @@ function FloatingButton() {
       "data-a11y-jargon": preferences.jargonSupport ? "on" : undefined,
       "data-a11y-font": preferences.font === "default" ? undefined : preferences.font,
       "data-a11y-spacing": preferences.spacing > 0 ? "on" : undefined,
+      "data-a11y-line-spacing": preferences.lineSpacing > 0 ? "on" : undefined,
       "data-a11y-motion": preferences.motion ? String(preferences.motion) : undefined,
       "data-a11y-border": preferences.border ? String(preferences.border) : undefined,
       "data-a11y-underline": preferences.underline ? "on" : undefined,
@@ -76,6 +77,7 @@ function FloatingButton() {
     };
     Object.entries(attrs).forEach(([name, value]) => value ? root.setAttribute(name, value) : root.removeAttribute(name));
     rootStyles.setProperty("--a11y-spacing", String(preferences.spacing));
+    rootStyles.setProperty("--a11y-line-spacing", String(preferences.lineSpacing));
     const textScale = (100 + preferences.textScale * 10) / 100;
     rootStyles.setProperty("--a11y-text-scale", String(textScale));
     rootStyles.setProperty("--a11y-cursor", getCursorValue(preferences.cursorColor, preferences.cursorSize));
@@ -84,7 +86,7 @@ function FloatingButton() {
       if (preferences.theme === "system") systemTheme.removeEventListener("change", applyTheme);
       root.removeAttribute("data-a11y-theme");
       Object.keys(attrs).forEach((name) => root.removeAttribute(name));
-      ["--a11y-spacing", "--a11y-text-scale", "--a11y-cursor", "--a11y-color-vision-filter"].forEach((name) => rootStyles.removeProperty(name));
+      ["--a11y-spacing", "--a11y-line-spacing", "--a11y-text-scale", "--a11y-cursor", "--a11y-color-vision-filter"].forEach((name) => rootStyles.removeProperty(name));
     };
   }, [preferences, id]);
 

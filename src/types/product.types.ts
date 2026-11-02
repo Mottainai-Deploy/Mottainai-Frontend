@@ -1,18 +1,3 @@
-export type ProductTrafficLight = "regular" | "attention" | "critical";
-export type EngineActionLevel = "Crítico" | "Alto" | "Moderado";
-
-export interface Product {
-  id: string;
-  barcode: string;
-  name: string;
-  category: string;
-  supplier: string;
-  stockQuantity: number;
-  shelfQuantity: number;
-  priceInCents: number;
-  trafficLight: ProductTrafficLight;
-}
-
 export interface ProductFilterState {
   search: string;
   category: string;

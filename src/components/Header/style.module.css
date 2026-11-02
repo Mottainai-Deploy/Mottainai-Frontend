@@ -56,7 +56,7 @@
     background-color: var(--motta-light-blue);
     border-color: var(--motta-light-blue);
     /* Texto */
-    color: #fff;
+    color: var(--main-white);
 }
 
 :global(html[data-a11y-theme="dark"]) .accountLink:hover,
@@ -78,7 +78,7 @@
     background-color: var(--motta-orange) !important;
     border-color: var(--motta-orange) !important;
     /* Texto */
-    color: #fff !important;
+    color: var(--main-white) !important;
 }
 
 .accountTooltip {

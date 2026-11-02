@@ -97,17 +97,17 @@
 
 .success {
     background-color: #d6fac9;
-    color: #205c1c;
+    color: var(--a11y-status-success-text);
 }
 
 .warning {
-    background-color: #ffe7b0;
-    color: #8a5200;
+    background-color: var(--a11y-status-warning-surface);
+    color: var(--a11y-status-warning-text);
 }
 
 .danger {
-    background-color: #f9dfe1;
-    color: #8f151b;
+    background-color: var(--a11y-status-critical-surface);
+    color: var(--a11y-status-critical-text);
 }
 
 .info {
@@ -120,7 +120,7 @@
     /* Aparência */
     background-color: var(--a11y-surface-raised);
     /* Texto */
-    color: #fff;
+    color: var(--main-white);
 }
 
 :global(html[data-a11y-theme="dark"]) .table {
@@ -143,8 +143,8 @@
     min-width: 3.375rem;
     min-height: 2.25rem;
     padding: 0.375rem 0.75rem;
-    background-color: var(--a11y-action-surface, #ded8d0);
-    border: 1px solid var(--a11y-action-border, #ded8d0);
+    background-color: var(--a11y-action-surface);
+    border: 1px solid var(--a11y-action-border);
     border-radius: 0.375rem;
     color: var(--a11y-action-text, var(--a11y-text-muted, #373431));
     font: inherit;

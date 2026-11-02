@@ -1,14 +1,36 @@
 import type { LoginCredentials, LoginResponse } from '@/types/auth.types';
+import { validateAuthProfile, validateAuthSession } from '@/utils/authResponseValidation';
+import { apiRequest, setApiSession, endApiSession } from './apiClient';
+import { getFirebaseIdToken } from './firebaseAuthService';
+import { getCurrentProfile } from './profileService';
 
-// O mock existe somente para desenvolvimento local e auditoria Lighthouse.
-export const isMockAuthenticationEnabled =
-  import.meta.env.DEV || import.meta.env.MODE === 'lighthouse';
+let authenticationAttempt = 0;
 
 export async function login(credentials: LoginCredentials): Promise<LoginResponse> {
-  if (import.meta.env.DEV || import.meta.env.MODE === 'lighthouse') {
-    const { loginWithMockCredentials } = await import('@/services/mockAuthService');
-    return loginWithMockCredentials(credentials);
+  const attempt = ++authenticationAttempt;
+  setApiSession(null);
+  const checkAttempt = () => {
+    if (attempt !== authenticationAttempt) throw new Error('Esta tentativa de acesso foi substituída.');
+  };
+  try {
+    const firebaseIdToken = await getFirebaseIdToken(credentials);
+    checkAttempt();
+    const response = await apiRequest<unknown>('/auth/firebase', {
+      method: 'POST', authenticated: false, body: { firebaseIdToken },
+    });
+    checkAttempt();
+    const session = validateAuthSession(response);
+    setApiSession(session);
+    const profile = await getCurrentProfile();
+    checkAttempt();
+    return { token: session.accessToken, user: validateAuthProfile(profile) };
+  } catch (error) {
+    if (attempt === authenticationAttempt) setApiSession(null);
+    throw error;
   }
+}
 
-  throw new Error('A autenticação real não está configurada neste ambiente.');
+export async function logout(): Promise<void> {
+  authenticationAttempt += 1;
+  return endApiSession();
 }

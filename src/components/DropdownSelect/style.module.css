@@ -26,7 +26,7 @@
     appearance: none;
     border: 1px solid var(--a11y-card-border, rgba(var(--motta-blue-rgb), 0.2));
     border-radius: 0.75rem;
-    background-color: var(--a11y-surface, #fff);
+    background-color: var(--a11y-surface, var(--main-white));
 
     /* Texto */
     color: var(--a11y-text-muted, #373431);
@@ -71,7 +71,7 @@
 
 :global(html[data-a11y-theme="dark"]) .select {
     background-color: var(--a11y-surface, #17232e);
-    color: var(--a11y-foreground, #fff);
+    color: var(--a11y-foreground, var(--main-white));
 }
 
 :global(html[data-a11y-theme="dark"]) .root {

@@ -174,7 +174,7 @@ input:focus-visible {
 }
 
 .secondary {
-    border: 1px solid #d5d0ca;
+    border: 1px solid var(--a11y-form-control-border);
     background: var(--a11y-surface, var(--main-white));
     color: var(--a11y-text-muted, #373431);
 }
@@ -199,7 +199,7 @@ input:focus-visible {
 .format select {
     min-height: 2.75rem;
     padding: 0.5rem 0.75rem;
-    border: 1px solid #d5d0ca;
+    border: 1px solid var(--a11y-form-control-border);
     border-radius: 0.55rem;
     background: var(--a11y-surface, var(--main-white));
     font: inherit;
@@ -207,7 +207,7 @@ input:focus-visible {
 
 .message {
     margin: 20px 0px 0px;
-    color: #205c1c;
+    color: var(--a11y-status-success-text);
 }
 
 .error {
@@ -245,9 +245,18 @@ input:focus-visible {
 
 .fieldError {
     /* Texto */
-    color: #a32720;
+    color: var(--a11y-field-error-text);
     font-size: 0.85rem;
     font-weight: 600;
+}
+
+:global(html[data-a11y-theme="dark"]) .fieldError,
+:global(html[data-a11y-theme="dark"]) .error {
+    color: var(--a11y-error-text);
+}
+
+:global(html[data-a11y-theme="dark"]) .message {
+    color: var(--a11y-success-text);
 }
 
 .wide {
@@ -368,7 +377,7 @@ input:focus-visible {
 }
 
 .success h2 {
-    color: #205c1c;
+    color: var(--a11y-status-success-text);
 }
 
 .success .actions {
@@ -383,7 +392,7 @@ input:focus-visible {
     height: 4rem;
     border-radius: 50%;
     background: #d6fac9;
-    color: #205c1c;
+    color: var(--a11y-status-success-text);
     font-size: 1.75rem;
 }
 
@@ -394,12 +403,12 @@ html[data-a11y-theme="dark"] .backdrop {
 
 html[data-a11y-theme="dark"] .success h2 {
     /* Texto */
-    color: #ff963d;
+    color: var(--motta-highlight-orange);
 }
 
 html[data-a11y-theme="dark"] .success-icon {
     /* Aparência */
-    background-color: #ff963d;
+    background-color: var(--motta-highlight-orange);
 
     /* Texto */
     color: #243746;
@@ -407,7 +416,7 @@ html[data-a11y-theme="dark"] .success-icon {
 
 html[data-a11y-theme="dark"] .modal :global([data-tone="success"]) {
     /* Aparência */
-    background-color: #ff963d;
+    background-color: var(--motta-highlight-orange);
 
     /* Texto */
     color: #243746;
@@ -489,5 +498,18 @@ html[data-a11y-theme="dark"] .modal :global([data-tone="success"]) {
     /* Aparência */
     background-color: var(--a11y-surface-raised);
     /* Texto */
-    color: #fff;
+    color: var(--main-white);
+}
+.catalogFields {
+    /* Layout */
+    display: grid;
+    gap: 1rem;
+
+    /* Tamanho */
+    min-width: 0;
+    padding: 0;
+    margin: 0;
+
+    /* Aparência */
+    border: 0;
 }

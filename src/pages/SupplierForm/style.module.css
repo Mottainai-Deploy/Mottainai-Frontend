@@ -63,7 +63,7 @@
     min-height: 2.5rem;
     box-sizing: border-box;
     padding: 0.55rem 0.75rem;
-    border: 1px solid #bcb5ae;
+    border: 1px solid var(--a11y-textarea-border);
     border-radius: 0.45rem;
     background: var(--a11y-surface-raised, #f5f1ee);
     color: var(--a11y-text-muted, #625d58);
@@ -95,24 +95,33 @@
 
 .fieldError {
     margin: 0;
-    color: #a12622;
+    color: var(--a11y-field-error-text-strong);
     font-size: 0.8rem;
     font-weight: 700;
 }
 
 .formField [aria-invalid="true"] {
-    border-color: #a12622;
+    border-color: var(--a11y-field-error-border-strong);
 }
 
 .feedback {
     margin: 1rem 0 0;
-    color: #205c1c;
+    color: var(--a11y-status-success-text);
     font-size: 0.85rem;
     font-weight: 700;
 }
 
 .feedbackError {
-    color: #8f1d18;
+    color: var(--a11y-feedback-error-text);
+}
+
+:global(html[data-a11y-theme="dark"]) .fieldError,
+:global(html[data-a11y-theme="dark"]) .feedbackError {
+    color: var(--a11y-error-text);
+}
+
+:global(html[data-a11y-theme="dark"]) .feedback {
+    color: var(--a11y-success-text);
 }
 
 .actions {
@@ -136,9 +145,9 @@
 }
 
 .cancelButton {
-    border: 2px solid #9b3035;
-    background: #fff2f2;
-    color: #8f151b;
+    border: 2px solid var(--a11y-danger-border);
+    background: var(--a11y-danger-surface);
+    color: var(--a11y-status-critical-text);
 }
 
 .submitButton {
@@ -149,7 +158,7 @@
 }
 
 .cancelButton:hover {
-    background: #ffe1e1;
+    background: var(--a11y-danger-hover-surface);
 }
 
 .submitButton:hover {

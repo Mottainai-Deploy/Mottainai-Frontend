@@ -1,107 +1,38 @@
-import { useCallback, useState } from 'react';
-import EngineActionModal from '@/components/EngineActionModal';
+import { Link, useSearchParams } from 'react-router-dom';
 import ReusableTable from '@/components/ReusableTable';
-import type { EngineDecision, EngineDecisionStatus } from '@/types/engine-decision.types';
-import type { EngineActionDialogState } from '@/types/engine-action-modal.types';
-import type { ReusableTableColumn, TableCellTone } from '@/types/reusable-table.types';
-import InfoCard from "@/components/InfoCard"
-import styles from './style.module.css';
+import AlertDetails from '@/components/AlertDetails';
+import { useAlertDirectory } from '@/hooks/useAlertDirectory';
+import type { ApiAlert, AlertStatus } from '@/types/alert-api.types';
+import type { ReusableTableColumn } from '@/types/reusable-table.types';
+import { alertPriorityLabels, alertStatusLabels, alertTypeLabels } from '@/utils/alertPresentation';
+import { formatCountDate } from '@/utils/inventoryPresentation';
+import styles from '@/styles/operations.module.css';
 
-const statusTones: Record<EngineDecisionStatus, TableCellTone> = {
-    'Sem ação': 'neutral',
-    Aprovado: 'success',
-    'Em aguardo': 'warning',
-    Crítico: 'danger',
-    Editado: 'info',
-};
-
-function createDecisionColumns(
-    onViewAction: (decision: EngineDecision, trigger: HTMLButtonElement) => void,
-): ReusableTableColumn<EngineDecision>[] {
-    return [
-    {
-        id: 'sku',
-        header: 'SKU',
-        renderCell: (decision) => decision.sku,
-    },
-    {
-        id: 'tactic',
-        header: 'Tática',
-        renderCell: (decision) => decision.tactic,
-    },
-    {
-        id: 'status',
-        header: 'Status',
-        renderCell: (decision) => decision.status,
-        display: 'badge',
-        tone: (decision) => statusTones[decision.status],
-        align: 'center',
-    },
-    {
-        id: 'action',
-        header: 'Ação',
-        renderCell: (decision) => decision.tactic,
-        display: 'action',
-        actionLabel: (decision) => `Ver ação sugerida pelo motor para o SKU ${decision.sku}`,
-        onAction: (decision, event) => onViewAction(decision, event.currentTarget),
-        align: 'center',
-    },
-    ];
-}
-
-const decisionData: EngineDecision[] = [
-    { id: 'decision-01', time: '14:32', sku: 'NIK-CAM-ESP-BRC-G', tactic: 'Desconto de 30%', status: 'Sem ação' },
-    { id: 'decision-02', time: '14:32', sku: 'NIK-CAM-ESP-BRC-G', tactic: 'Sugestão de Compra', status: 'Aprovado' },
-    { id: 'decision-03', time: '14:32', sku: 'NIK-CAM-ESP-BRC-G', tactic: 'Doação', status: 'Em aguardo' },
-    { id: 'decision-04', time: '14:32', sku: 'NIK-CAM-ESP-BRC-G', tactic: 'Promoção relâmpago', status: 'Crítico' },
-    { id: 'decision-05', time: '14:32', sku: 'NIK-CAM-ESP-BRC-G', tactic: 'Promoção relâmpago', status: 'Editado' },
-    { id: 'decision-06', time: '14:32', sku: 'NIK-CAM-ESP-BRC-G', tactic: 'Promoção relâmpago', status: 'Crítico' },
-    { id: 'decision-07', time: '14:32', sku: 'NIK-CAM-ESP-BRC-G', tactic: 'Promoção relâmpago', status: 'Editado' },
-    { id: 'decision-08', time: '14:32', sku: 'NIK-CAM-ESP-BRC-G', tactic: 'Promoção relâmpago', status: 'Em aguardo' },
-    { id: 'decision-09', time: '14:32', sku: 'NIK-CAM-ESP-BRC-G', tactic: 'Promoção relâmpago', status: 'Sem ação' },
-    { id: 'decision-10', time: '14:32', sku: 'NIK-CAM-ESP-BRC-G', tactic: 'Promoção relâmpago', status: 'Sem ação' },
-    { id: 'decision-11', time: '14:32', sku: 'NIK-CAM-ESP-BRC-G', tactic: 'Promoção relâmpago', status: 'Sem ação' },
-    { id: 'decision-12', time: '14:32', sku: 'NIK-CAM-ESP-BRC-G', tactic: 'Promoção relâmpago', status: 'Sem ação' },
+const columns: ReusableTableColumn<ApiAlert>[] = [
+  { id: 'title', header: 'Alerta', renderCell: (alert) => alert.title },
+  { id: 'type', header: 'Tipo', renderCell: (alert) => alertTypeLabels[alert.alertType] ?? alert.alertType },
+  { id: 'priority', header: 'Prioridade', renderCell: (alert) => alertPriorityLabels[alert.priority] ?? alert.priority },
+  { id: 'status', header: 'Status', renderCell: (alert) => alertStatusLabels[alert.status] ?? alert.status },
+  { id: 'date', header: 'Gerado em', renderCell: (alert) => formatCountDate(alert.generatedAt) },
+  { id: 'details', header: 'Detalhes', renderCell: (alert) => <Link to={`?alert=${alert.id}`}>Abrir alerta {alert.id}</Link> },
 ];
 
-function Overview() {
-    const [actionDialog, setActionDialog] = useState<EngineActionDialogState | null>(null);
-
-    const handleViewAction = (decision: EngineDecision, trigger: HTMLButtonElement) => {
-        setActionDialog({ decision, trigger });
-    };
-
-    const handleCloseAction = useCallback(() => setActionDialog(null), []);
-
-    const decisionColumns = createDecisionColumns(handleViewAction);
-
-    return (
-        <section aria-labelledby="overview-title">
-            <h1 className={styles['sr-only']} id="overview-title">Visão geral</h1>
-            <div className={styles['container-card']}>
-                <InfoCard title="Última varredura" value="há 50min" footer="Falta 10min para a próxima" tone="danger"/>
-                <InfoCard title="Número de SKUs escaneados" value="1201" footer="De 1203 SKUs totais" tone="neutral"/>
-                <InfoCard title="Alertas Emitidos" value="104" footer="5% a mais comparado a útima varredura" tone="warning"/>
-                <InfoCard title="Assertividade do Motor" value="64,32%" footer="Quanto mais dados mais acertivo" tone="success"/>
-            </div>
-
-            <div className={styles.page}>
-                <ReusableTable
-                    title="Decisões do motor – últimas 24 horas"
-                    columns={decisionColumns}
-                    data={decisionData}
-                    rowKey={(decision) => decision.id}
-                />
-            </div>
-            {actionDialog && (
-                <EngineActionModal
-                    decision={actionDialog.decision}
-                    triggerElement={actionDialog.trigger}
-                    onClose={handleCloseAction}
-                />
-            )}
-        </section>
-    );
+export default function Overview() {
+  const { state, setState, query, alerts } = useAlertDirectory();
+  const [params] = useSearchParams();
+  const id = params.get('alert');
+  return <section className={styles.page} aria-labelledby="overview-title">
+    <h1 id="overview-title">Visão geral do motor</h1>
+    <p>Alertas e sugestões registrados no servidor para a loja da sua conta. Esta consulta não gera previsões novas.</p>
+    <div className={styles.card}>
+      <div className={styles.grid}>
+        <div className={styles.field}><label htmlFor="alert-search">Buscar alertas</label><input id="alert-search" value={state.search} onChange={(event) => setState((current) => ({ ...current, search: event.target.value }))} /></div>
+        <div className={styles.field}><label htmlFor="alert-status-filter">Filtrar por status</label><select id="alert-status-filter" value={state.status} onChange={(event) => setState((current) => ({ ...current, status: event.target.value }))}><option value="">Todos os status</option>{(Object.keys(alertStatusLabels) as AlertStatus[]).map((status) => <option key={status} value={status}>{alertStatusLabels[status]}</option>)}</select></div>
+      </div><button type="button" onClick={() => setState((current) => ({ ...current, reload: current.reload + 1 }))}>Atualizar alertas</button>
+    </div>
+    {query.status === 'loading' && <p role="status">Carregando alertas da loja…</p>}
+    {query.status === 'error' && <p role="alert">{query.error}</p>}
+    {query.status === 'success' && <><p role="status">Consulta concluída: {alerts.length} alertas encontrados.</p><ReusableTable title="Alertas da loja" columns={columns} data={alerts} rowKey={(alert) => alert.id} emptyMessage="Nenhum alerta corresponde à consulta." /></>}
+    {id !== null && <AlertDetails key={id} id={id} onChanged={() => setState((current) => ({ ...current, reload: current.reload + 1 }))} />}
+  </section>;
 }
-
-export default Overview;
