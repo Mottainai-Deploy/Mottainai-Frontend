@@ -6,6 +6,9 @@
 
 *SPA em React + TypeScript + Vite. Catálogo, estoque e operações disponíveis consultam a API configurada; telas sem endpoint não exibem dados de demonstração.*
 
+Acesse o projeto em vercel: [Vercel](mottainai-frontend-ten.vercel.app) 
+Ou no Render: [Render](https://mottainai-frontend.onrender.com)
+
 <br/>
 
 [![React](https://img.shields.io/badge/React-19.2.8-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
