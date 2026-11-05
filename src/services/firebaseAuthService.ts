@@ -16,7 +16,8 @@ export async function getFirebaseIdToken(credentials: LoginCredentials): Promise
     });
     const data: unknown = await response.json();
     if (!response.ok) throw new Error(firebaseErrorMessage(data));
-    if (typeof data !== 'object' || data === null || !('idToken' in data) || typeof data.idToken !== 'string') {
+    if (typeof data !== 'object' || data === null || !('idToken' in data)
+      || typeof data.idToken !== 'string' || !data.idToken.trim()) {
       throw new Error('A resposta de autenticação não contém um token válido.');
     }
     return data.idToken;
